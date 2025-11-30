@@ -57,7 +57,11 @@ export class PropertiesPage {
   }
 
    addProperty() {
-    this.newProperty.id = Math.max(...this.properties.map(p=> p.id!))+1;
+    this.newProperty.id = this.properties.length
+  ? Math.max(...this.properties.map(p => p.id!)) + 1
+  : 1;
+
+    console.log(this.newProperty.id);
 
     this.properties.push(this.newProperty);
     this.filename = "";
