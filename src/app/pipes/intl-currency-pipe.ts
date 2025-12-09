@@ -17,5 +17,4 @@ export class IntlCurrencyPipe implements PipeTransform {
       });
       return foamatter.format(value);
   }
-
 }

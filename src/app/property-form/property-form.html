@@ -1,5 +1,4 @@
-<p>property-form works!</p>
-<form (ngSubmit)="addProperty()" id="property-form" class="bg-white p-8 rounded-lg shadow-md">
+<section id="property-form" class="bg-white p-8 rounded-lg shadow-md">
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
       <label for="province" class="block text-gray-700 font-bold mb-2">Province</label>
@@ -69,9 +68,9 @@
     </div>
   </div>
   <div class="mt-8">
-    <button type="submit"
+    <button type="button" (click)="addProperty()"
       class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
       Add Property
     </button>
   </div>
-</form>
+</section>

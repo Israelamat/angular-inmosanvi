@@ -1,4 +1,4 @@
-<main class="container mx-auto px-4 py-8 mt-16 grow">
+<main class="container mx-auto px-4 py-8 mt-10 grow">
   <section id="add-property" class="mb-12">
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Add New Property</h2>
     <app-property-form (added)="addProperty($event)"></app-property-form>
@@ -6,12 +6,44 @@
 
   <section>
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Properties for Sale</h2>
+    <div class="text-gray-600 text-sm p-2 mb-4">
+      Showing {{ filteredProperties().length }} properties
+      filtered by "{{ search() }}" in province "{{ province() || 'All' }}".
+    </div>
+    <section id="search-and-filter" class="mb-6 bg-white p-6 rounded-lg shadow-md">
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
+
+        <div class="md:col-span-2 lg:col-span-2">
+          <label class="block text-gray-700 font-bold mb-2">Search</label>
+          <input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" [ngModel]="search()"
+            (ngModelChange)="search.set($event)" placeholder="Piso céntrico, chalet...">
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-bold mb-2">Province</label>
+          <select class="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white" [ngModel]="province()"
+            (ngModelChange)="province.set($event)">
+            <option value="">All</option>
+            <option value="Madrid">Madrid</option>
+            <option value="Barcelona">Barcelona</option>
+            <option value="Valencia">Valencia</option>
+          </select>
+        </div>
+
+      </div>
+    </section>
+
     <div id="property-listings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      @for (property of properties; track property.id) {
-      <app-property-card (deleted)="deleteProperty($event)" [property]="property"></app-property-card>
-      }@empty {
+
+      @for (property of filteredProperties(); track property.id) {
+
+      <app-property-card [property]="property" (deleted)="deleteProperty($event)">
+      </app-property-card>
+
+      } @empty {
       <p class="text-2xl text-gray-500">No properties found.</p>
       }
+
     </div>
   </section>
 </main>
