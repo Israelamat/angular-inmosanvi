@@ -21,13 +21,14 @@
 
         <div>
           <label class="block text-gray-700 font-bold mb-2">Province</label>
-          <select class="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white" [ngModel]="province()"
-            (ngModelChange)="province.set($event)">
-            <option value="">All</option>
-            <option value="Madrid">Madrid</option>
-            <option value="Barcelona">Barcelona</option>
-            <option value="Valencia">Valencia</option>
+          <select [ngModel]="provinceId()" (ngModelChange)="provinceId.set($event)">
+            <option [ngValue]="0">All</option>
+
+            @for (p of provinces(); track p.id) {
+            <option [ngValue]="p.id">{{ p.name }}</option>
+            }
           </select>
+
         </div>
 
       </div>
