@@ -12,7 +12,7 @@ import { ProvincesService } from '../services/provinces-service';
   imports: [FormsModule, PropertyForm, PropertyCard],
   templateUrl: './properties-page.html',
   styleUrls: ['./properties-page.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 export class PropertiesPage {
   private propertiesService = inject(PropertiesService);
