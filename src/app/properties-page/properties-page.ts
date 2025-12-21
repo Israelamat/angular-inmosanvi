@@ -9,7 +9,7 @@ import { ProvincesService } from '../services/provinces-service';
 
 @Component({
   selector: 'properties-page',
-  imports: [FormsModule, PropertyForm, PropertyCard],
+  imports: [FormsModule, PropertyCard],
   templateUrl: './properties-page.html',
   styleUrls: ['./properties-page.css'],
 
@@ -54,16 +54,16 @@ export class PropertiesPage {
   });
 
 
-  addProperty(propertyInsert: PropertyInsert) {
-    this.propertiesService.addProperty(propertyInsert)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (newProp) => {
-          this.properties.update(list => [newProp.property, ...list]);
-        },
-        error: err => console.error('Error adding property', err)
-      });
-  }
+  // addProperty(propertyInsert: PropertyInsert) {
+  //   this.propertiesService.addProperty(propertyInsert)
+  //     .pipe(takeUntilDestroyed(this.destroyRef))
+  //     .subscribe({
+  //       next: (newProp) => {
+  //         this.properties.update(list => [newProp.property, ...list]);
+  //       },
+  //       error: err => console.error('Error adding property', err)
+  //     });
+  // }
 
   deleteProperty(id?: number) {
     if (!id) return;

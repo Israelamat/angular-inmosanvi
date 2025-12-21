@@ -1,46 +1,35 @@
-import { ChangeDetectionStrategy, Component, effect, EventEmitter, inject, Output, signal } from '@angular/core';
-import { PropertyInsert, Province, Town } from '../interfaces/propoerty';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { PropertyInsert, Town } from '../interfaces/propoerty';
 import { FormsModule } from '@angular/forms';
 import { EncodeBase64Directive } from '../directives/encode-base64';
 import { ProvincesService } from '../services/provinces-service';
+import { PropertiesService } from '../services/properties-service';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-property-form',
   imports: [FormsModule, EncodeBase64Directive],
   templateUrl: './property-form.html',
-  styleUrl: './property-form.css',
+  styleUrls: ['./property-form.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-
+  host: {
+    class: 'grow flex flex-col', // opcional: centrar formulario si quieres
+  }
 })
 export class PropertyForm {
-  @Output() added = new EventEmitter<PropertyInsert>();
   imagePreview = signal<string>("");
   filename: string = "";
   private provincesService = inject(ProvincesService);
+  private propertiesService = inject(PropertiesService);
+  private router = inject(Router);
+
   province = signal('');
   towns = signal<Town[]>([]);
   provinceId = signal(0);
-  provinces = signal<Province[]>([]);
+  provinces = signal<any[]>([]); // puedes tipar con Province[]
 
-  constructor() {
-    effect(() => {
-      const resp = this.provincesService.provincesResource.value();
-      if (resp) this.provinces.set(resp.provinces);
-    });
-
-    const townsResource = this.provincesService.getTownsResource(this.provinceId);
-    effect(() => {
-
-      const resp = townsResource.value();
-      if (resp) {
-        this.towns.set(resp.towns);
-        this.newProperty.townId = 0; 
-      } else {
-        this.towns.set([]);
-        this.newProperty.townId = 0;
-      }
-    });
-  }
+  propertyCreated = false; // para el CanDeactivate guard
 
   newProperty: PropertyInsert = {
     title: '',
@@ -54,22 +43,36 @@ export class PropertyForm {
     mainPhoto: '',
   };
 
-  addProperty() {
-    this.added.emit(this.newProperty);
-    this.newProperty = {
-      title: '',
-      description: '',
-      price: 0,
-      address: '',
-      sqmeters: 0,
-      numRooms: 0,
-      numBaths: 0,
-      townId: 0,
-      mainPhoto: '',
-    };
+  constructor() {
+    // Cargar provincias
+    effect(() => {
+      const resp = this.provincesService.provincesResource.value();
+      if (resp) this.provinces.set(resp.provinces);
+    });
 
-    this.imagePreview.set("");
-    this.filename = "";
+    // Cargar municipios según provincia seleccionada
+    const townsResource = this.provincesService.getTownsResource(this.provinceId);
+    effect(() => {
+      const resp = townsResource.value();
+      if (resp) {
+        this.towns.set(resp.towns);
+        this.newProperty.townId = 0;
+      } else {
+        this.towns.set([]);
+        this.newProperty.townId = 0;
+      }
+    });
+  }
+
+  addProperty() {
+    this.propertiesService.addProperty(this.newProperty)
+      .subscribe({
+        next: (createdProp) => {
+          this.propertyCreated = true; 
+          this.router.navigate(['/properties', createdProp.property.id]);
+        },
+        error: (err) => console.error('Error adding property', err)
+      });
   }
 
   changeImage(fileInput: HTMLInputElement) {
