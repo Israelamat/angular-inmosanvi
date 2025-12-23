@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { PropertyInsert, Town } from '../interfaces/propoerty';
+import { PropertyInsert, Province, Town } from '../../interfaces/propoerty';
 import { FormsModule } from '@angular/forms';
-import { EncodeBase64Directive } from '../directives/encode-base64';
-import { ProvincesService } from '../services/provinces-service';
-import { PropertiesService } from '../services/properties-service';
+import { EncodeBase64Directive } from '../../directives/encode-base64';
+import { ProvincesService } from '../../services/provinces-service';
+import { PropertiesService } from '../../services/properties-service';
 import { tap } from 'rxjs';
 
 @Component({
@@ -14,7 +14,7 @@ import { tap } from 'rxjs';
   styleUrls: ['./property-form.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'grow flex flex-col', // opcional: centrar formulario si quieres
+    class: 'grow flex flex-col',
   }
 })
 export class PropertyForm {
@@ -27,9 +27,9 @@ export class PropertyForm {
   province = signal('');
   towns = signal<Town[]>([]);
   provinceId = signal(0);
-  provinces = signal<any[]>([]); // puedes tipar con Province[]
+  provinces = signal<Province[]>([]);
 
-  propertyCreated = false; // para el CanDeactivate guard
+  propertyCreated = signal(false);
 
   newProperty: PropertyInsert = {
     title: '',
@@ -44,13 +44,11 @@ export class PropertyForm {
   };
 
   constructor() {
-    // Cargar provincias
     effect(() => {
       const resp = this.provincesService.provincesResource.value();
       if (resp) this.provinces.set(resp.provinces);
     });
 
-    // Cargar municipios según provincia seleccionada
     const townsResource = this.provincesService.getTownsResource(this.provinceId);
     effect(() => {
       const resp = townsResource.value();
@@ -68,7 +66,7 @@ export class PropertyForm {
     this.propertiesService.addProperty(this.newProperty)
       .subscribe({
         next: (createdProp) => {
-          this.propertyCreated = true; 
+          this.propertyCreated.set(true); 
           this.router.navigate(['/properties', createdProp.property.id]);
         },
         error: (err) => console.error('Error adding property', err)

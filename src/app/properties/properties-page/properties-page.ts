@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { PropertiesService } from '../services/properties-service';
-import { Property, PropertyInsert, Province, Town } from '../interfaces/propoerty';
+import { PropertiesService } from '../../services/properties-service';
+import { Property, PropertyInsert, Province, Town } from '../../interfaces/propoerty';
 import { PropertyForm } from '../property-form/property-form';
 import { PropertyCard } from '../property-card/property-card';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ProvincesService } from '../services/provinces-service';
+import { ProvincesService } from '../../services/provinces-service';
 
 @Component({
   selector: 'properties-page',
@@ -53,31 +53,11 @@ export class PropertiesPage {
     });
   });
 
-
-  // addProperty(propertyInsert: PropertyInsert) {
-  //   this.propertiesService.addProperty(propertyInsert)
-  //     .pipe(takeUntilDestroyed(this.destroyRef))
-  //     .subscribe({
-  //       next: (newProp) => {
-  //         this.properties.update(list => [newProp.property, ...list]);
-  //       },
-  //       error: err => console.error('Error adding property', err)
-  //     });
-  // }
-
   deleteProperty(id?: number) {
     if (!id) return;
 
     this.propertiesService.deleteProperty(id)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.properties.update(list =>
-            list.filter(p => p.id !== id)
-          );
-        },
-        error: err => console.error(err)
-      });
+      .subscribe();
   }
-
 }

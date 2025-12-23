@@ -13,9 +13,9 @@ import { Router } from '@angular/router';
   }
 })
 export class LoginPage {
-  #router = inject(Router);
+  private router = inject(Router);
   
   login = () =>{
-    this.#router.navigate(['/properties']);
+    this.router.navigate(['/properties']);
   }
 }
