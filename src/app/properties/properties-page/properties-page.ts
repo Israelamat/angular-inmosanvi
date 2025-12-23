@@ -34,6 +34,10 @@ export class PropertiesPage {
     effect(() => {
       const resp = this.provincesService.provincesResource.value();
       if (resp) this.provinces.set(resp.provinces);
+
+      const id = this.provinceId();
+      const selected = this.provinces().find(p => p.id === id);
+      this.province.set(selected?.name || 'All');
     });
   }
 
