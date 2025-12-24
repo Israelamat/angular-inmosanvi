@@ -1,94 +1,188 @@
-<section id="property-form" class="bg-white p-8 rounded-lg shadow-md">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<form #propertyForm="ngForm" (ngSubmit)="addProperty()">
+  <section id="property-form" class="bg-white p-8 rounded-lg shadow-md">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-    <!-- Select de Provincias -->
-    <div>
-      <label for="province" class="block text-gray-700 font-bold mb-2">Province</label>
-      <select id="province" name="province" required [(ngModel)]="provinceId"
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-        <option value="0">Select a province</option>
+      <!-- Select de Provincias -->
+      <div>
+        <label for="province" class="block text-gray-700 font-bold mb-2">Province</label>
+        <select id="province" name="province" required [(ngModel)]="provinceId" pattern="[1-9]\d*"
+          #provinceModel="ngModel"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <option value="0">Select a province</option>
 
-        @for (p of provinces(); track p.id) {
-        <option [ngValue]="p.id">{{p.name}}</option>
-        }
-      </select>
-    </div>
-
-    <!-- Select de Pueblos -->
-    <div>
-      <label for="town" class="block text-gray-700 font-bold mb-2">Town</label>
-      <select id="town" name="town" [(ngModel)]="newProperty.townId" required
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-        <option value="0">Select a town</option>
-
-        @for (t of towns(); track t.id) {
-        <option [ngValue]="t.id">{{t.name}}</option>
-        }
-      </select>
-    </div>
-
-  </div>
-
-  <div class="mt-6">
-    <label for="address" class="block text-gray-700 font-bold mb-2">Address</label>
-    <input type="text" id="address" name="address" [(ngModel)]="newProperty.address" required
-      class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-  </div>
-  <div class="mt-6">
-    <label for="title" class="block text-gray-700 font-bold mb-2">Listing Title</label>
-    <input type="text" id="title" name="title" [(ngModel)]="newProperty.title" required pattern="[A-Z][a-zA-Z0-9 ]*"
-      class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-  </div>
-  <div class="mt-6">
-    <label for="description" class="text-gray-700 font-bold mb-2">Description</label>
-    <button type="button" id="translate-button"
-      class="text-slate-500 border border-slate-500 shadow-md font-bold py-1 px-2 rounded-lg hover:text-slate-600 ms-2 mb-2 cursor-pointer">Translate
-      🇬🇧</button>
-    <textarea id="description" name="description" required [(ngModel)]="newProperty.description"
-      class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-  </textarea>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-    <div>
-      <label for="sqmeters" class="block text-gray-700 font-bold mb-2">Square Meters</label>
-      <input type="number" id="sqmeters" name="sqmeters" [(ngModel)]="newProperty.sqmeters" min="1" required
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-    <div>
-      <label for="numRooms" class="block text-gray-700 font-bold mb-2">Number of Rooms</label>
-      <input type="number" id="numRooms" name="numRooms" [(ngModel)]="newProperty.numRooms" min="1" max="20" required
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-    <div>
-      <label for="numBaths" class="block text-gray-700 font-bold mb-2">Number of Baths</label>
-      <input type="number" id="numBaths" name="numBaths" [(ngModel)]="newProperty.numBaths" min="1" max="20" required
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-    <div>
-      <label for="price" class="block text-gray-700 font-bold mb-2">Price (€)</label>
-      <input type="number" id="price" name="price" min="1" [(ngModel)]="newProperty.price" required
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-    <div>
-      <label for="mainPhoto" class="block text-gray-700 font-bold mb-2">Main Photo</label>
-      <input type="file" id="mainPhoto" name="mainPhoto" [(ngModel)]="filename" #fileImage accept="image/*"
-        (change)="changeImage(fileImage)" required encodeBase64 (encoded)="newProperty.mainPhoto = $event"
-        class="w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-      <!-- Contenedor para la previsualización de la imagen -->
-      @if (imagePreview()) {
-      <div class="mt-4">
-        <img [src]="imagePreview()" alt="Image preview" class="w-full h-48 object-cover rounded-lg">
+          @for (p of provinces(); track p.id) {
+          <option [ngValue]="p.id">{{p.name}}</option>
+          }
+        </select>
+        <div class="error-msg text-sm text-red-700">
+          @if (provinceModel.errors?.["required"]) {
+          Province is required
+          }
+          @if (provinceModel.errors?.["pattern"]) {
+          You must select a province
+          }
+        </div>
       </div>
-      }
+
+      <!-- Select de Pueblos -->
+      <div>
+        <label for="town" class="block text-gray-700 font-bold mb-2">Town</label>
+        <select id="town" name="town" [(ngModel)]="newProperty.townId" required pattern="[1-9]\d*" #townModel="ngModel"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <option value="0">Select a town</option>
+
+          @for (t of towns(); track t.id) {
+          <option [ngValue]="t.id">{{t.name}}</option>
+          }
+        </select>
+        <div class="error-msg text-sm text-red-700">
+          @if (townModel.errors?.["required"]) {
+          Town is required
+          }
+          @if (townModel.errors?.["pattern"]) {
+          You must select a town
+          }
+        </div>
+      </div>
+
     </div>
-  </div>
-  <div class="mt-8">
-    <button type="button" (click)="addProperty()"
-      class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-      Add Property
-    </button>
-  </div>
-</section>
+
+    <!-- Adress -->
+    <div class="mt-6">
+      <label for="address" class="block text-gray-700 font-bold mb-2">Address</label>
+      <input type="text" id="address" name="address" [(ngModel)]="newProperty.address" required
+        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+
+    <!-- Title -->
+    <div class="mt-6">
+      <label for="title" class="block text-gray-700 font-bold mb-2">Listing Title</label>
+      <input type="text" id="title" name="title" [(ngModel)]="newProperty.title" required minlength="5"
+        pattern="^[a-zA-Z][a-zA-Z ]*$" #titleModel="ngModel"
+        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <div class="error-msg text-sm text-red-700">
+        @if (titleModel.errors?.["required"]) {
+        Title is required
+        }
+        @if (titleModel.errors?.["minlength"]) {
+        Title must be at least 5 characters
+        }
+        @if (titleModel.errors?.["pattern"]) {
+        Title must start with a letter and contain only letters and spaces
+        }
+      </div>
+    </div>
+
+    <!-- Deescription -->
+    <div class="mt-6">
+      <label for="description" class="text-gray-700 font-bold mb-2">Description</label>
+      <button type="button" id="translate-button"
+        class="text-slate-500 border border-slate-500 shadow-md font-bold py-1 px-2 rounded-lg hover:text-slate-600 ms-2 mb-2 cursor-pointer">Translate
+        🇬🇧</button>
+      <textarea id="description" name="description" required [(ngModel)]="newProperty.description"
+        #descriptionModel="ngModel"
+        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </textarea>
+      <div class="error-msg text-sm text-red-700">
+        @if (descriptionModel.errors?.['required']) {
+        Description is required
+        }
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+      <!-- sqmeters -->
+      <div>
+        <label for="sqmeters" class="block text-gray-700 font-bold mb-2">Square Meters</label>
+        <input type="number" id="sqmeters" name="sqmeters" [(ngModel)]="newProperty.sqmeters" min="1" required
+          #sqmetersModel="ngModel"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="error-msg text-sm text-red-700">
+          @if (sqmetersModel.errors?.["required"]) {
+          Square meters is required
+          }
+          @if (sqmetersModel.errors?.["min"]) {
+          Square meters must be greater than 0
+          }
+        </div>
+      </div>
+
+      <!-- numRooms-->
+      <div>
+        <label for="numRooms" class="block text-gray-700 font-bold mb-2">Number of Rooms</label>
+        <input type="number" id="numRooms" name="numRooms" [(ngModel)]="newProperty.numRooms" min="1" max="20" required
+          #numRoomsModel="ngModel"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="error-msg text-sm text-red-700">
+          @if (numRoomsModel.errors?.["required"]) {
+          Number of rooms is required
+          }
+          @if (numRoomsModel.errors?.["min"] || numRoomsModel.errors?.["max"]) {
+          Number of rooms must be between 1 and 20
+          }
+
+        </div>
+      </div>
+
+      <!-- numBaths -->
+      <div>
+        <label for="numBaths" class="block text-gray-700 font-bold mb-2">Number of Baths</label>
+        <input type="number" id="numBaths" name="numBaths" [(ngModel)]="newProperty.numBaths" min="1" max="20" required
+          #numBathsModel="ngModel"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="error-msg text-sm text-red-700">
+          @if (numBathsModel.errors?.["required"]) {
+          Number of baths is required
+          }
+          @if (numBathsModel.errors?.["min"] || numBathsModel.errors?.["max"]) {
+          Number of baths must be between 1 and 20
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+      <!-- Price -->
+      <div>
+        <label for="price" class="block text-gray-700 font-bold mb-2">Price (€)</label>
+        <input type="number" id="price" name="price" min="1" [(ngModel)]="newProperty.price" required
+          #priceModel="ngModel"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="error-msg text-sm text-red-700">
+          @if (priceModel.errors?.["required"]) {
+          Price is required
+          }
+          @if (priceModel.errors?.["min"]) {
+          Price must be greater than 0
+          }
+        </div>
+      </div>
+
+      <!-- MainPhoto -->
+      <div>
+        <label for="mainPhoto" class="block text-gray-700 font-bold mb-2">Main Photo</label>
+        <input type="file" id="mainPhoto" name="mainPhoto" [(ngModel)]="filename" #fileImage accept="image/*"
+          (change)="changeImage(fileImage)" required encodeBase64 (encoded)="newProperty.mainPhoto = $event" required
+          ngModel #imageModel="ngModel"
+          class="w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+        <div class="error-msg text-sm text-red-700">
+          @if (imageModel.errors?.['required']) {
+          Image is required
+          }
+        </div>
+        <!-- Contenedor para la previsualización de la imagen -->
+        @if (imagePreview()) {
+        <div class="mt-4">
+          <img [src]="imagePreview()" alt="Image preview" class="w-full h-48 object-cover rounded-lg">
+        </div>
+        }
+      </div>
+    </div>
+    <div class="mt-8">
+      <button type="submit" [disabled]="propertyForm.invalid"
+        class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:bg-blue-300">
+        Add Property
+      </button>
+    </div>
+  </section>
+</form>

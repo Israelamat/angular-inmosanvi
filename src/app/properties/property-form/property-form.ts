@@ -76,6 +76,7 @@ export class PropertyForm {
   changeImage(fileInput: HTMLInputElement) {
     if (!fileInput.files || fileInput.files.length === 0) {
       this.imagePreview.set("");
+      this.newProperty.mainPhoto = "";
       return;
     }
 
