@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, linkedSignal, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, linkedSignal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PropertiesService } from '../../services/properties-service';
-import { Property, PropertyInsert, Province, Town } from '../../interfaces/propoerty';
-import { PropertyForm } from '../property-form/property-form';
+import { Property, Province, Town } from '../../interfaces/propoerty';
 import { PropertyCard } from '../property-card/property-card';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProvincesService } from '../../services/provinces-service';

@@ -4,10 +4,9 @@
     <!-- Select de Provincias -->
     <div>
       <label for="province" class="block text-gray-700 font-bold mb-2">Province</label>
-      <select id="province" name="province" required [field]="propertyForm" [(ngModel)]="provinceId"
+      <select id="province" [field]="propertyForm.provinceId" 
         class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-        <option value="0">Select a province</option>
-
+        <option [ngValue]="0">Select a province</option>
         @for (p of provinces(); track p.id) {
         <option [ngValue]="p.id">{{p.name}}</option>
         }
@@ -17,21 +16,16 @@
     <!-- Select de Pueblos -->
     <div>
       <label for="town" class="block text-gray-700 font-bold mb-2">Town</label>
-      <select class="w-full px-3 py-2 border rounded-lg" [field]="propertyForm.townId" [ngModel]="propertyForm.townId">
-
+      <select class="w-full px-3 py-2 border rounded-lg" [field]="propertyForm.townId">
         <option [ngValue]="0">Select a town</option>
-
         @for (t of towns(); track t.id) {
         <option [ngValue]="t.id">{{ t.name }}</option>
         }
       </select>
 
       @for (error of propertyForm.townId().errors(); track error.kind) {
-      <div class="error-msg text-sm text-red-700">
-        {{ error.message }}
-      </div>
+      <div class="text-red-700 text-sm">{{ error.message }}</div>
       }
-
     </div>
 
   </div>

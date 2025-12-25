@@ -26,6 +26,7 @@ export class PropertyForm {
 
   province = signal('');
   towns = signal<Town[]>([]);
+  townIdSelect = signal<string>('0');
   provinceId = signal(0);
   provinces = signal<Province[]>([]);
 
@@ -41,6 +42,7 @@ export class PropertyForm {
     numBaths: 0,
     townId: 0,
     mainPhoto: '',
+    provinceId: 0,
   });
 
   propertyForm = form(this.newProperty, (schema) => {
@@ -58,6 +60,7 @@ export class PropertyForm {
     min(schema.numBaths, 1, { message: 'Number of baths must be at least 1' });
 
     required(schema.townId, { message: 'Town is required' });
+    required(schema.provinceId, { message: 'Province is required' });
     required(schema.mainPhoto, { message: 'Image is required' });
   });
 
