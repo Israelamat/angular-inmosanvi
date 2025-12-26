@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, linkedSignal, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule } from '@angular/forms';
 import { PropertiesService } from '../../services/properties-service';
 import { Property, PropertyInsert, Province, Town } from '../../interfaces/propoerty';
 import { PropertyForm } from '../property-form/property-form';
 import { PropertyCard } from '../property-card/property-card';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ProvincesService } from '../../services/provinces-service';
+import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'properties-page',
@@ -29,9 +30,22 @@ export class PropertiesPage {
   propertiesResource = this.propertiesService.propertiesResource;
   properties = linkedSignal(() => this.propertiesService.propertiesResource.value()?.properties ?? []);
 
+  searchControl = new FormControl('');
+  searchSignal = toSignal(this.searchControl.valueChanges.pipe(debounceTime(600)));
+  allProperties: Property[] = [];
+  filteredProperties = signal<Property[]>([]);
 
   constructor() {
     effect(() => {
+      const allProps = this.propertiesResource.value()?.properties || [];
+      const query = (this.searchSignal() || '').toLowerCase();
+
+      this.filteredProperties.set(
+        allProps.filter(p => p.title.toLowerCase().includes(query))
+      );
+    });
+
+     effect(() => {
       const resp = this.provincesService.provincesResource.value();
       if (resp) this.provinces.set(resp.provinces);
 
@@ -40,22 +54,6 @@ export class PropertiesPage {
       this.province.set(selected?.name || 'All');
     });
   }
-
-  filteredProperties = computed(() => {
-    const text = (this.search() ?? '').toLowerCase().trim();
-    const selectedProvinceId = this.provinceId();
-
-    return this.properties().filter((p: Property) => {
-      const propTitle = (p.title ?? '').toLowerCase();
-      const propAddress = (p.address ?? '').toLowerCase();
-      const propProvinceId = p.town?.province?.id ?? 0;
-
-      const matchSearch = propTitle.includes(text) || propAddress.includes(text);
-      const matchProvince = selectedProvinceId === 0 || propProvinceId === selectedProvinceId;
-
-      return matchSearch && matchProvince;
-    });
-  });
 
   deleteProperty(id?: number) {
     if (!id) return;
