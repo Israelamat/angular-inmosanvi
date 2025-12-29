@@ -5,7 +5,6 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { EncodeBase64Directive } from '../../directives/encode-base64';
 import { ProvincesService } from '../../services/provinces-service';
 import { PropertiesService } from '../../services/properties-service';
-import { CanDeactivate } from '@angular/router';
 
 export interface CanComponentDeactivate {
   canDeactivate: () => boolean;
@@ -21,7 +20,7 @@ export interface CanComponentDeactivate {
     class: 'grow flex flex-col',
   }
 })
-export class PropertyForm implements CanComponentDeactivate{
+export class PropertyForm implements CanComponentDeactivate {
   imagePreview = signal<string>("");
   filename: string = "";
 
@@ -114,20 +113,24 @@ export class PropertyForm implements CanComponentDeactivate{
       this.imagePreview.set('');
       this.filename = '';
       this.propertyForm.get('mainPhoto')!.setValue('');
-      this.propertyForm.get('filename')!.setValue('');
+      this.propertyForm.get('mainPhoto')!.markAsTouched();
       return;
     }
 
     const file = fileInput.files[0];
     this.filename = file.name;
-    this.propertyForm.get('filename')!.setValue(this.filename);
 
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.addEventListener('loadend', () => {
-      this.imagePreview.set(reader.result as string);
-    });
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      this.imagePreview.set(base64);
+
+      this.propertyForm.get('mainPhoto')!.setValue(base64);
+      this.propertyForm.get('mainPhoto')!.markAsDirty();
+    };
   }
+
 
   getControl(name: string) {
     return this.propertyForm.get(name)!;

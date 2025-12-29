@@ -1,39 +1,38 @@
 <main class="container mx-auto px-4 py-8 mt-10 grow">
-  
+
   <section>
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Properties for Sale</h2>
     <div class="text-gray-600 text-sm p-2 mb-4">
       Showing {{ filteredProperties().length }} properties
-      filtered by "{{ search() }}" in province "{{ province() || 'All' }}".
+      filtered by "{{ searchSignal() }}" in province "{{ province() || 'All' }}".
     </div>
     <section id="search-and-filter" class="mb-6 bg-white p-6 rounded-lg shadow-md">
       <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
 
         <div class="md:col-span-2 lg:col-span-2">
           <label class="block text-gray-700 font-bold mb-2">Search</label>
-          <input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" [ngModel]="search()"
-            (ngModelChange)="search.set($event)" placeholder="Piso céntrico, chalet...">
+          <input type="text" class="w-full px-3 py-2 border border-gray-200 rounded-lg" [formControl]="searchControl"
+            placeholder="Piso céntrico, chalet...">
         </div>
 
         <div>
           <label class="block text-gray-700 font-bold mb-2">Province</label>
-          <select [ngModel]="provinceId()" (ngModelChange)="provinceId.set($event)">
-            <option [ngValue]="0">All</option>
-
+          <select class="w-full px-3 py-2 border border-gray-200 rounded-lg" [value]="provinceId()"
+            (change)="setProvince($event)">
+            <option value="0">All</option>
             @for (p of provinces(); track p.id) {
-            <option [ngValue]="p.id">{{ p.name }}</option>
+            <option [value]="p.id">{{ p.name }}</option>
             }
           </select>
 
         </div>
-
       </div>
     </section>
 
     <div id="property-listings" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
       @for (property of filteredProperties(); track property.id) {
-        <app-property-card [property]="property" (deleted)="deleteProperty($event)"></app-property-card>
+      <app-property-card [property]="property" (deleted)="deleteProperty($event)"></app-property-card>
 
       } @empty {
       <p class="text-2xl text-gray-500">No properties found.</p>
