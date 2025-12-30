@@ -79,7 +79,11 @@ export class PropertyForm {
       this.propertyForm.provinceId(),
       this.propertyForm.townId(),
     ];
-    return !fields.some(f => typeof f === 'string' ? !f || f === '0' : !!f.errors?.()?.length);
+    fields.forEach(f => {
+      console.log(f.errors());
+    });
+    return fields.every(f => !(f.errors()?.length));
+
   });
 
   constructor() {
@@ -88,25 +92,27 @@ export class PropertyForm {
       if (resp) this.provinces.set(resp.provinces);
     });
 
-    const provinceIdSignal = computed(() => +this.provinceIdField());
-    console.log(provinceIdSignal);
+    const provinceIdSignal = computed(() => {
+      const value = this.propertyForm.provinceId().value();
+      return +value;
+    });
     const townsResource = this.provincesService.getTownsResource(provinceIdSignal);
 
     effect(() => {
-      this.provinceIdField();
-      untracked(() => this.townIdField.set('0'));
+      provinceIdSignal();
+      untracked(() => {
+        this.propertyForm.townId().value.set('0');
+      });
+
       const resp = townsResource.value();
       this.towns.set(resp ? resp.towns : []);
     });
-
 
     effect(() => { this.pristine.set(false); });
   }
 
   addProperty(event: Event) {
     event.preventDefault();
-    if (!this.isFormValid()) return;
-
     const raw = this.newProperty();
     const payload: PropertyInsert = {
       title: raw.title,
@@ -120,6 +126,8 @@ export class PropertyForm {
       mainPhoto: raw.mainPhoto,
       provinceId: +raw.provinceId // conversión a number
     };
+
+    if (!this.isFormValid()) return;
 
     this.propertiesService.addProperty(payload).subscribe({
       next: (created) => {
@@ -149,7 +157,6 @@ export class PropertyForm {
       this.newProperty.update(p => ({ ...p, mainPhoto: base64 }));
     };
   }
-
 
   canDeactivate(): boolean {
     return this.propertyCreated() || this.pristine();

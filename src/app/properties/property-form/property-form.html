@@ -8,40 +8,67 @@
         <label for="province" class="block text-gray-700 font-bold mb-2">Province</label>
         <select id="province" [field]="propertyForm.provinceId"
           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-          <option [ngValue]="0">Select a province</option>
+          <option [value]="0">Select a province</option>
           @for (p of provinces(); track p.id) {
-          <option [ngValue]="p.id.toString()">{{p.name}}</option>
+          <option [value]="p.id.toString()">{{p.name}}</option>
           }
         </select>
+
+        @for (error of propertyForm.provinceId().errors(); track error.kind) {
+        <div class="error-msg text-sm text-red-700">
+          {{ error.message }}
+        </div>
+        }
       </div>
 
       <!-- Select de Pueblos -->
       <div>
         <label for="town" class="block text-gray-700 font-bold mb-2">Town</label>
-        <select class="w-full px-3 py-2 border rounded-lg" [field]="propertyForm.townId">
-          <option [ngValue]="0">Select a town</option>
+
+        <select id="town" class="w-full px-3 py-2 border rounded-lg" [field]="propertyForm.townId">
+          <option value="0">Select a town</option>
           @for (t of towns(); track t.id) {
-          <option [ngValue]="t.id.toString()">{{ t.name }}</option>
+          <option [value]="t.id.toString()">{{ t.name }}</option>
           }
         </select>
 
         @for (error of propertyForm.townId().errors(); track error.kind) {
-        <div class="text-red-700 text-sm">{{ error.message }}</div>
+        <div class="error-msg text-sm text-red-700">
+          {{ error.message }}
+        </div>
         }
       </div>
 
+
     </div>
 
+    <!-- Address -->
     <div class="mt-6">
       <label for="address" class="block text-gray-700 font-bold mb-2">Address</label>
       <input type="text" id="address" [field]="propertyForm.address"
         class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+      @for (error of propertyForm.address().errors(); track error.kind) {
+      <div class="error-msg text-sm text-red-700">
+        {{ error.message }}
+      </div>
+      }
     </div>
+
+    <!-- Listong Title -->
     <div class="mt-6">
       <label for="title" class="block text-gray-700 font-bold mb-2">Listing Title</label>
       <input type="text" id="title" [field]="propertyForm.title"
         class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+@for (error of propertyForm.title().errors(); track error.kind){
+      <div class="error-msg text-sm text-red-700">
+        {{ error.message }}
+      </div>
+      }
     </div>
+
+    <!-- Description -->
     <div class="mt-6">
       <label for="description" class="text-gray-700 font-bold mb-2">Description</label>
       <button type="button" id="translate-button"
@@ -50,37 +77,85 @@
       <textarea id="description" [field]="propertyForm.description"
         class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
   </textarea>
+
+      @for (error of propertyForm.description().errors(); track error.kind) {
+      <div class="error-msg text-sm text-red-700">
+        {{ error.message }}
+      </div>
+      }
     </div>
 
+    <!-- Details -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+      <!-- sqmeters -->
       <div>
         <label for="sqmeters" class="block text-gray-700 font-bold mb-2">Square Meters</label>
         <input type="number" id="sqmeters" [field]="propertyForm.sqmeters"
           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        @for (error of propertyForm.sqmeters().errors(); track error.kind) {
+        <div class="error-msg text-sm text-red-700">
+          {{ error.message }}
+        </div>
+        }
       </div>
+
+      <!-- numRooms -->
       <div>
         <label for="numRooms" class="block text-gray-700 font-bold mb-2">Number of Rooms</label>
         <input type="number" id="numRooms" [field]="propertyForm.numRooms"
           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        @for (error of propertyForm.numRooms().errors(); track error.kind) {
+        <div class="error-msg text-sm text-red-700">
+          {{ error.message }}
+        </div>
+        }
       </div>
+
+      <!-- numBaths -->
       <div>
         <label for="numBaths" class="block text-gray-700 font-bold mb-2">Number of Baths</label>
         <input type="number" id="numBaths" [field]="propertyForm.numBaths"
           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        @for (error of propertyForm.numBaths().errors(); track error.kind) {
+        <div class="error-msg text-sm text-red-700">
+          {{ error.message }}
+        </div>
+        }
+
       </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+
+      <!-- price -->
       <div>
         <label for="price" class="block text-gray-700 font-bold mb-2">Price (€)</label>
         <input type="number" id="price" [field]="propertyForm.price"
           class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+        @for (error of propertyForm.price().errors(); track error.kind) {
+        <div class="error-msg text-sm text-red-700">
+          {{ error.message }}
+        </div>
+        }
+
       </div>
+
+      <!-- mainPhoto -->
       <div>
         <label for="mainPhoto" class="block text-gray-700 font-bold mb-2">Main Photo</label>
-        <input type="file" id="mainPhoto" name="mainPhoto" #fileImage accept="image/*"
-          (change)="changeImage(fileImage)" required encodeBase64
-          (encoded)=propertyForm.mainPhoto().setControlValue($event)
+        <input type="file" id="mainPhoto" name="mainPhoto" #fileImage accept="image/*" (change)="changeImage(fileImage)"
+          required encodeBase64 (encoded)=propertyForm.mainPhoto().setControlValue($event)
           class="w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+
+        @for (error of propertyForm.mainPhoto().errors(); track error.kind) {
+        <div class="error-msg text-sm text-red-700">
+          {{ error.message }}
+        </div>
+        }
+
         <!-- Contenedor para la previsualización de la imagen -->
         @if (imagePreview()) {
         <div class="mt-4">

@@ -2,16 +2,20 @@
 
 :is(input,textarea,select) {
   @apply border rounded-md;
-  &.ng-touched.ng-invalid {
+
+  &.is-invalid {
     @apply border-red-700 ring-red-600;
   }
-  &.ng-touched.ng-valid {
+  &.is-valid {
     @apply border-green-700 ring-green-700;
   }
-  &:not(.ng-touched.ng-invalid) ~ .error-msg {
+
+  &:not(.is-invalid) ~ .error-msg {
     @apply hidden;
   }
+
   &:focus {
     @apply ring-1;
   }
 }
+
