@@ -1,21 +1,21 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
-import { PropertyInsert, Province, Town } from '../../interfaces/propoerty';
+import { PropertyInsert, Province, Town, PropertyFormModel } from '../../interfaces/propoerty';
 import { FormsModule } from '@angular/forms';
 import { EncodeBase64Directive } from '../../directives/encode-base64';
 import { ProvincesService } from '../../services/provinces-service';
 import { PropertiesService } from '../../services/properties-service';
-import { form, required, min, minLength, pattern, Schema, Field } from '@angular/forms/signals';
+import { form, required, min, minLength, pattern, Field } from '@angular/forms/signals';
+import { CommonModule } from '@angular/common';
+import { max } from 'rxjs';
 
 @Component({
   selector: 'app-property-form',
-  imports: [FormsModule, EncodeBase64Directive, Field],
+  imports: [FormsModule, EncodeBase64Directive, Field, CommonModule],
   templateUrl: './property-form.html',
   styleUrls: ['./property-form.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: {
-    class: 'grow flex flex-col',
-  }
+  host: { class: 'grow flex flex-col' }
 })
 export class PropertyForm {
   imagePreview = signal<string>("");
@@ -24,15 +24,14 @@ export class PropertyForm {
   private propertiesService = inject(PropertiesService);
   private router = inject(Router);
 
-  province = signal('');
-  towns = signal<Town[]>([]);
-  townIdSelect = signal<string>('0');
-  provinceId = signal(0);
   provinces = signal<Province[]>([]);
+  towns = signal<Town[]>([]);
 
-  propertyCreated = signal(false);
+  provinceIdField = signal<string>('0');
+  townIdField = signal<string>('0');
 
-  newProperty = signal<PropertyInsert>({
+
+  newProperty = signal<PropertyFormModel>({
     title: '',
     description: '',
     price: 0,
@@ -40,28 +39,47 @@ export class PropertyForm {
     sqmeters: 0,
     numRooms: 0,
     numBaths: 0,
-    townId: 0,
+    townId: '0',
     mainPhoto: '',
-    provinceId: 0,
+    provinceId: '0',
   });
+
+  pristine = signal(true);
+  propertyCreated = signal(false);
 
   propertyForm = form(this.newProperty, (schema) => {
     required(schema.title, { message: 'Title is required' });
     minLength(schema.title, 5, { message: 'Title must be at least 5 characters' });
     pattern(schema.title, /^[a-zA-Z][a-zA-Z ]*$/, { message: 'Title must start with a letter and contain only letters and spaces' });
-
     required(schema.description, { message: 'Description is required' });
     required(schema.address, { message: 'Address is required' });
-
     min(schema.price, 1, { message: 'Price must be at least 1' });
     min(schema.sqmeters, 1, { message: 'Square meters must be at least 1' });
-
     min(schema.numRooms, 1, { message: 'Number of rooms must be at least 1' });
     min(schema.numBaths, 1, { message: 'Number of baths must be at least 1' });
+    required(schema.mainPhoto, { message: 'Image is required' });
+
+    required(schema.provinceId, { message: 'Province is required' });
+    pattern(schema.provinceId, /^[1-9]\d*$/, { message: 'Select a valid province' });
 
     required(schema.townId, { message: 'Town is required' });
-    required(schema.provinceId, { message: 'Province is required' });
-    required(schema.mainPhoto, { message: 'Image is required' });
+    pattern(schema.townId, /^[1-9]\d*$/, { message: 'Select a valid town' });
+  });
+
+  isFormValid = computed(() => {
+    const fields = [
+      this.propertyForm.title(),
+      this.propertyForm.description(),
+      this.propertyForm.address(),
+      this.propertyForm.price(),
+      this.propertyForm.sqmeters(),
+      this.propertyForm.numRooms(),
+      this.propertyForm.numBaths(),
+      this.propertyForm.mainPhoto(),
+      this.propertyForm.provinceId(),
+      this.propertyForm.townId(),
+    ];
+    return !fields.some(f => typeof f === 'string' ? !f || f === '0' : !!f.errors?.()?.length);
   });
 
   constructor() {
@@ -70,46 +88,70 @@ export class PropertyForm {
       if (resp) this.provinces.set(resp.provinces);
     });
 
-    const townsResource = this.provincesService.getTownsResource(this.provinceId);
+    const provinceIdSignal = computed(() => +this.provinceIdField());
+    console.log(provinceIdSignal);
+    const townsResource = this.provincesService.getTownsResource(provinceIdSignal);
+
     effect(() => {
+      this.provinceIdField();
+      untracked(() => this.townIdField.set('0'));
       const resp = townsResource.value();
-      if (resp) {
-        this.towns.set(resp.towns);
-        this.newProperty.update(p => ({
-          ...p,
-          townId: 0
-        }));
-      } else {
-        this.towns.set([]);
-        this.newProperty.update(p => ({
-          ...p,
-          townId: 0
-        }));
-      }
+      this.towns.set(resp ? resp.towns : []);
     });
+
+
+    effect(() => { this.pristine.set(false); });
   }
 
-  addProperty() {
-    this.propertiesService.addProperty(this.newProperty())
-      .subscribe({
-        next: (createdProp) => {
-          this.propertyCreated.set(true);
-          this.router.navigate(['/properties', createdProp.property.id]);
-        },
-        error: (err) => console.error('Error adding property', err)
-      });
+  addProperty(event: Event) {
+    event.preventDefault();
+    if (!this.isFormValid()) return;
+
+    const raw = this.newProperty();
+    const payload: PropertyInsert = {
+      title: raw.title,
+      description: raw.description,
+      price: raw.price,
+      address: raw.address,
+      sqmeters: raw.sqmeters,
+      numRooms: raw.numRooms,
+      numBaths: raw.numBaths,
+      townId: +raw.townId,        // conversión a number 
+      mainPhoto: raw.mainPhoto,
+      provinceId: +raw.provinceId // conversión a number
+    };
+
+    this.propertiesService.addProperty(payload).subscribe({
+      next: (created) => {
+        this.propertyCreated.set(true);
+        this.router.navigate(['/properties', created.property.id]);
+      },
+      error: (err) => console.error('Error adding property', err)
+    });
   }
 
   changeImage(fileInput: HTMLInputElement) {
-    if (!fileInput.files || fileInput.files.length === 0) {
-      this.imagePreview.set("");
+    if (!fileInput.files?.length) {
+      this.imagePreview.set('');
+      this.newProperty.update(p => ({ ...p, mainPhoto: '' }));
+      fileInput.value = '';
       return;
     }
 
-    const reader: FileReader = new FileReader();
-    reader.readAsDataURL(fileInput.files[0]);
-    reader.addEventListener('loadend', () => {
-      this.imagePreview.set(reader.result as string);
-    });
+    const file = fileInput.files[0];
+    this.filename = file.name;
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      this.imagePreview.set(base64);
+      this.newProperty.update(p => ({ ...p, mainPhoto: base64 }));
+    };
+  }
+
+
+  canDeactivate(): boolean {
+    return this.propertyCreated() || this.pristine();
   }
 }

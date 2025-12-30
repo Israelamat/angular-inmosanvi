@@ -1,96 +1,99 @@
 <section id="property-form" class="bg-white p-8 rounded-lg shadow-md">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <form (submit)="addProperty($event)" class="space-y-6">
 
-    <!-- Select de Provincias -->
-    <div>
-      <label for="province" class="block text-gray-700 font-bold mb-2">Province</label>
-      <select id="province" [field]="propertyForm.provinceId" 
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-        <option [ngValue]="0">Select a province</option>
-        @for (p of provinces(); track p.id) {
-        <option [ngValue]="p.id">{{p.name}}</option>
-        }
-      </select>
-    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-    <!-- Select de Pueblos -->
-    <div>
-      <label for="town" class="block text-gray-700 font-bold mb-2">Town</label>
-      <select class="w-full px-3 py-2 border rounded-lg" [field]="propertyForm.townId">
-        <option [ngValue]="0">Select a town</option>
-        @for (t of towns(); track t.id) {
-        <option [ngValue]="t.id">{{ t.name }}</option>
-        }
-      </select>
-
-      @for (error of propertyForm.townId().errors(); track error.kind) {
-      <div class="text-red-700 text-sm">{{ error.message }}</div>
-      }
-    </div>
-
-  </div>
-
-  <div class="mt-6">
-    <label for="address" class="block text-gray-700 font-bold mb-2">Address</label>
-    <input type="text" id="address" [field]="propertyForm.address"
-      class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-  </div>
-  <div class="mt-6">
-    <label for="title" class="block text-gray-700 font-bold mb-2">Listing Title</label>
-    <input type="text" id="title" [field]="propertyForm.title"
-      class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-  </div>
-  <div class="mt-6">
-    <label for="description" class="text-gray-700 font-bold mb-2">Description</label>
-    <button type="button" id="translate-button"
-      class="text-slate-500 border border-slate-500 shadow-md font-bold py-1 px-2 rounded-lg hover:text-slate-600 ms-2 mb-2 cursor-pointer">Translate
-      🇬🇧</button>
-    <textarea id="description" [field]="propertyForm.description"
-      class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-  </textarea>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-    <div>
-      <label for="sqmeters" class="block text-gray-700 font-bold mb-2">Square Meters</label>
-      <input type="number" id="sqmeters" [field]="propertyForm.sqmeters"
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-    <div>
-      <label for="numRooms" class="block text-gray-700 font-bold mb-2">Number of Rooms</label>
-      <input type="number" id="numRooms" [field]="propertyForm.numRooms"
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-    <div>
-      <label for="numBaths" class="block text-gray-700 font-bold mb-2">Number of Baths</label>
-      <input type="number" id="numBaths" [field]="propertyForm.numBaths"
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-    <div>
-      <label for="price" class="block text-gray-700 font-bold mb-2">Price (€)</label>
-      <input type="number" id="price" [field]="propertyForm.price"
-        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-    </div>
-    <div>
-      <label for="mainPhoto" class="block text-gray-700 font-bold mb-2">Main Photo</label>
-      <input type="file" id="mainPhoto" name="mainPhoto" [(ngModel)]="filename" #fileImage accept="image/*"
-        (change)="changeImage(fileImage)" required encodeBase64
-        (encoded)=propertyForm.mainPhoto().setControlValue($event)
-        class="w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-      <!-- Contenedor para la previsualización de la imagen -->
-      @if (imagePreview()) {
-      <div class="mt-4">
-        <img [src]="imagePreview()" alt="Image preview" class="w-full h-48 object-cover rounded-lg">
+      <!-- Select de Provincias -->
+      <div>
+        <label for="province" class="block text-gray-700 font-bold mb-2">Province</label>
+        <select id="province" [field]="propertyForm.provinceId"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <option [ngValue]="0">Select a province</option>
+          @for (p of provinces(); track p.id) {
+          <option [ngValue]="p.id.toString()">{{p.name}}</option>
+          }
+        </select>
       </div>
-      }
+
+      <!-- Select de Pueblos -->
+      <div>
+        <label for="town" class="block text-gray-700 font-bold mb-2">Town</label>
+        <select class="w-full px-3 py-2 border rounded-lg" [field]="propertyForm.townId">
+          <option [ngValue]="0">Select a town</option>
+          @for (t of towns(); track t.id) {
+          <option [ngValue]="t.id.toString()">{{ t.name }}</option>
+          }
+        </select>
+
+        @for (error of propertyForm.townId().errors(); track error.kind) {
+        <div class="text-red-700 text-sm">{{ error.message }}</div>
+        }
+      </div>
+
     </div>
-  </div>
-  <div class="mt-8">
-    <button type="button" (click)="addProperty()"
-      class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-      Add Property
-    </button>
-  </div>
+
+    <div class="mt-6">
+      <label for="address" class="block text-gray-700 font-bold mb-2">Address</label>
+      <input type="text" id="address" [field]="propertyForm.address"
+        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div class="mt-6">
+      <label for="title" class="block text-gray-700 font-bold mb-2">Listing Title</label>
+      <input type="text" id="title" [field]="propertyForm.title"
+        class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div class="mt-6">
+      <label for="description" class="text-gray-700 font-bold mb-2">Description</label>
+      <button type="button" id="translate-button"
+        class="text-slate-500 border border-slate-500 shadow-md font-bold py-1 px-2 rounded-lg hover:text-slate-600 ms-2 mb-2 cursor-pointer">Translate
+        🇬🇧</button>
+      <textarea id="description" [field]="propertyForm.description"
+        class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+  </textarea>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+      <div>
+        <label for="sqmeters" class="block text-gray-700 font-bold mb-2">Square Meters</label>
+        <input type="number" id="sqmeters" [field]="propertyForm.sqmeters"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label for="numRooms" class="block text-gray-700 font-bold mb-2">Number of Rooms</label>
+        <input type="number" id="numRooms" [field]="propertyForm.numRooms"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label for="numBaths" class="block text-gray-700 font-bold mb-2">Number of Baths</label>
+        <input type="number" id="numBaths" [field]="propertyForm.numBaths"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+      <div>
+        <label for="price" class="block text-gray-700 font-bold mb-2">Price (€)</label>
+        <input type="number" id="price" [field]="propertyForm.price"
+          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label for="mainPhoto" class="block text-gray-700 font-bold mb-2">Main Photo</label>
+        <input type="file" id="mainPhoto" name="mainPhoto" #fileImage accept="image/*"
+          (change)="changeImage(fileImage)" required encodeBase64
+          (encoded)=propertyForm.mainPhoto().setControlValue($event)
+          class="w-full text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+        <!-- Contenedor para la previsualización de la imagen -->
+        @if (imagePreview()) {
+        <div class="mt-4">
+          <img [src]="imagePreview()" alt="Image preview" class="w-full h-48 object-cover rounded-lg">
+        </div>
+        }
+      </div>
+    </div>
+    <div class="mt-8">
+      <button type="submit" [disabled]="!isFormValid()"
+        class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg disabled:bg-blue-300 hover:bg-blue-600">
+        Add Property
+      </button>
+    </div>
+  </form>
 </section>

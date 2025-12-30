@@ -33,6 +33,18 @@ export interface PropertyInsert {
   provinceId: number
 }
 
+export interface PropertyFormModel {
+  title: string;
+  description: string;
+  price: number;
+  address: string;
+  sqmeters: number;
+  numRooms: number;
+  numBaths: number;
+  townId: string;     
+  mainPhoto: string;
+  provinceId: string; 
+}
 
 export interface ProvincesResponse{
   provinces:Province[]
