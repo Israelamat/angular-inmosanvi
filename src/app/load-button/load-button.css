@@ -1,0 +1,31 @@
+button {
+  position: relative;
+}
+
+button .load-overlay {
+  box-sizing: border-box;
+  padding: 5px;
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button .load-overlay .load-icon {
+  animation: spin 1s linear infinite;
+  aspect-ratio: 1 / 1;
+  height: 24px;
+  width: 24px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

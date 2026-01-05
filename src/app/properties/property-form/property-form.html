@@ -61,7 +61,7 @@
       <input type="text" id="title" [field]="propertyForm.title"
         class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
 
-@for (error of propertyForm.title().errors(); track error.kind){
+      @for (error of propertyForm.title().errors(); track error.kind){
       <div class="error-msg text-sm text-red-700">
         {{ error.message }}
       </div>
@@ -165,10 +165,12 @@
       </div>
     </div>
     <div class="mt-8">
-      <button type="submit" [disabled]="!isFormValid()"
-        class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg disabled:bg-blue-300 hover:bg-blue-600">
+      <app-load-button [loading]="isSubmitting()"
+        colorClass="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg disabled:bg-blue-300 hover:bg-blue-600"
+        type="submit">
         Add Property
-      </button>
+      </app-load-button>
+
     </div>
   </form>
 </section>

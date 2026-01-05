@@ -8,10 +8,12 @@ import { PropertiesService } from '../../services/properties-service';
 import { form, required, min, minLength, pattern, Field } from '@angular/forms/signals';
 import { CommonModule } from '@angular/common';
 import { max } from 'rxjs';
+import { LoadButton } from '../../load-button/load-button';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-property-form',
-  imports: [FormsModule, EncodeBase64Directive, Field, CommonModule],
+  imports: [FormsModule, EncodeBase64Directive, Field, CommonModule, LoadButton],
   templateUrl: './property-form.html',
   styleUrls: ['./property-form.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,10 +28,9 @@ export class PropertyForm {
 
   provinces = signal<Province[]>([]);
   towns = signal<Town[]>([]);
-
   provinceIdField = signal<string>('0');
   townIdField = signal<string>('0');
-
+  isSubmitting = signal(false);
 
   newProperty = signal<PropertyFormModel>({
     title: '',
@@ -80,7 +81,7 @@ export class PropertyForm {
       this.propertyForm.townId(),
     ];
     fields.forEach(f => {
-      console.log(f.errors());
+      //console.log(f.errors());
     });
     return fields.every(f => !(f.errors()?.length));
 
@@ -113,6 +114,11 @@ export class PropertyForm {
 
   addProperty(event: Event) {
     event.preventDefault();
+    if (!this.isFormValid()) return;
+    this.isSubmitting.set(true);
+    setTimeout(() => {
+    Swal.fire('Éxito', 'Propiedad guardada', 'success');
+  }, 1500);
     const raw = this.newProperty();
     const payload: PropertyInsert = {
       title: raw.title,
@@ -134,7 +140,9 @@ export class PropertyForm {
         this.propertyCreated.set(true);
         this.router.navigate(['/properties', created.property.id]);
       },
-      error: (err) => console.error('Error adding property', err)
+      error: (err) => {console.error('Error adding property', err);
+        this.isSubmitting.set(false);
+      }
     });
   }
 
