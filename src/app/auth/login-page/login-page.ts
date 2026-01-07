@@ -57,9 +57,11 @@ export class LoginPage {
 
     this.authService.login(this.userLogin()).subscribe({
       next: () => {
-        this.isSubmitting.set(true);
-        Swal.fire('Success', 'Logged in successfully', 'success');
-        this.router.navigate(['/properties']);
+        this.authService.getMe().subscribe(user => {
+          this.isSubmitting.set(true);
+          Swal.fire('Success', 'Logged in successfully', 'success');
+          this.router.navigate(['/properties']);
+        });
       },
       error: (err) => {
         Swal.fire('Error', 'Could not log in with those credentials', 'error');

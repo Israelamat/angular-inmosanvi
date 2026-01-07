@@ -5,7 +5,7 @@
   "compilerOptions": {
     "outDir": "./out-tsc/app",
     "types": [
-      "node", "google.accounts"
+      "node", "google.accounts", "facebook-js-sdk"
     ]
   },
   "include": [

@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-top-menu',
@@ -10,5 +11,12 @@ import { RouterLink } from '@angular/router';
 
 })
 export class TopMenu {
+  private router = inject(Router);
+  private authService = inject(AuthService);
+
+  logout = () => {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 
 }

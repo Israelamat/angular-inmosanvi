@@ -8,6 +8,7 @@ import { provideSignalFormsConfig, SignalFormsConfig } from '@angular/forms/sign
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideSweetAlert2 } from '@sweetalert2/ngx-sweetalert2';
 import { provideGoogleId } from './google-login/google-login.config';
+import { authInterceptor } from './shared/interceptors/auth-interceptor';
 
 export const NG_STATUS_CLASSES: SignalFormsConfig['classes'] = {
   'is-valid': field => field.state().valid(),   // <-- Llamamos al signal
@@ -26,7 +27,8 @@ export const appConfig: ApplicationConfig = {
     provideSweetAlert2({ fireOnInit: false, dismissOnDestroy: true, }),
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules)),
-    provideHttpClient(withFetch(), withInterceptors([baseUrlInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([baseUrlInterceptor, authInterceptor])),
+    provideClientHydration(withEventReplay()),
     provideSignalFormsConfig({
       classes: NG_STATUS_CLASSES,
     }),

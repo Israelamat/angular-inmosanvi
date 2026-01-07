@@ -30,7 +30,8 @@ export interface PropertyInsert {
   numBaths: number;
   townId: number;
   mainPhoto: string;
-  provinceId: number
+  provinceId: number;
+  mine?: boolean
 }
 
 export interface PropertyFormModel {

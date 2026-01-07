@@ -15,6 +15,7 @@ import { RouterLink } from '@angular/router';
 })
 export class PropertyCard {
   @Input({ required: true }) property!: Property;
+  @Input() canDelete = signal(false);
   @Output() deleted = new EventEmitter<number>();
 
   deleteProperty() {

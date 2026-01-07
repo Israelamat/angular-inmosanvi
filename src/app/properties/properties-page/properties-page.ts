@@ -1,21 +1,24 @@
-import { Component, computed, DestroyRef, effect, inject, linkedSignal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, linkedSignal, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PropertiesService } from '../../services/properties-service';
 import { Property, Province, Town } from '../../interfaces/propoerty';
 import { PropertyCard } from '../property-card/property-card';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProvincesService } from '../../services/provinces-service';
+import { AuthService } from '../../services/auth.service';
+import { map, Observable } from 'rxjs';
 
 @Component({
   selector: 'properties-page',
   imports: [FormsModule, PropertyCard],
   templateUrl: './properties-page.html',
   styleUrls: ['./properties-page.css'],
-
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PropertiesPage {
   private propertiesService = inject(PropertiesService);
   private provincesService = inject(ProvincesService);
+  private authService = inject(AuthService);
   private destroyRef = inject(DestroyRef);
   filename: string = "";
 
@@ -28,6 +31,11 @@ export class PropertiesPage {
   propertiesResource = this.propertiesService.propertiesResource;
   properties = linkedSignal(() => this.propertiesService.propertiesResource.value()?.properties ?? []);
 
+  canDelete(property?: Property): WritableSignal<boolean> {
+    console.log(property?.mine ?? false);
+    return signal(property?.mine ?? false);
+  }
+
 
   constructor() {
     effect(() => {
@@ -39,6 +47,7 @@ export class PropertiesPage {
       this.province.set(selected?.name || 'All');
     });
   }
+
 
   filteredProperties = computed(() => {
     const text = (this.search() ?? '').toLowerCase().trim();

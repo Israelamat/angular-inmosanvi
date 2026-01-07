@@ -37,3 +37,17 @@ export interface LoginErrorResponse {
   statusCode: number;
   error: string;
 }
+
+export interface MyUser {
+  id: number;
+  name: string;
+  email: string;
+  avatar: string;
+  latitude: string;
+  longitude: string;
+  me: boolean
+}
+
+export interface MyUserResponse {
+  user: MyUser
+}
