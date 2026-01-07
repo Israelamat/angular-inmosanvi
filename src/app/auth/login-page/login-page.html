@@ -1,33 +1,64 @@
 <main class="container mx-auto px-4 py-8 mt-16 grow flex items-center justify-center">
   <div class="w-full max-w-xl">
-    <form id="login-form" class="bg-white p-8 rounded-lg shadow-md" (ngSubmit)="login()">
-      <h2 class="text-2xl font-bold text-gray-800 mb-8 text-center">Log in</h2>
+    <form class="bg-white p-8 rounded-lg shadow-md" (submit)="login($event)">
+      <h2 class="text-2xl font-bold text-gray-800 mb-8 text-center">
+        Log in
+      </h2>
 
+      <!-- Email -->
       <div class="mb-6">
-        <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
-        <input type="email" id="email" name="email"
-          class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="tu.email@ejemplo.com">
+        <label class="block text-gray-700 font-bold mb-2">
+          Email
+        </label>
+
+        <input type="email" [value]="loginForm.email().value()"
+          (input)="loginForm.email().value.set($any($event.target).value)"
+          class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+
+        @for (error of loginForm.email().errors(); track error.kind) {
+        <div class="text-sm text-red-700">
+          {{ error.message }}
+        </div>
+        }
       </div>
 
+      <!-- Password -->
       <div class="mb-6">
-        <label for="password" class="block text-gray-700 font-bold mb-2">Password</label>
-        <input type="password" id="password" name="password"
-          class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="••••••••">
+        <label class="block text-gray-700 font-bold mb-2">
+          Password
+        </label>
+
+        <input type="password" [value]="loginForm.password().value()"
+          (input)="loginForm.password().value.set($any($event.target).value)"
+          class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+
+        @for (error of loginForm.password().errors(); track error.kind) {
+        <div class="text-sm text-red-700">
+          {{ error.message }}
+        </div>
+        }
       </div>
 
-      <div>
-        <button type="submit"
-          class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
-          Login
-        </button>
+      <!-- Submit -->
+       <div class="mb-4 flex justify-center">
+        <!-- Solo se cargará en navegador, el div necesita ancho y alto -->
+        <div appGoogleLogin
+             class="w-60 h-12"
+             (login)="loggedGoogle($event)">
+        </div>
       </div>
+      <app-load-button class="w-full" [loading]="isSubmitting()"
+        colorClass="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg disabled:bg-blue-300 hover:bg-blue-600"
+        type="submit">
+        Login
+      </app-load-button>
 
+
+      <!-- Register -->
       <div class="mt-6 text-center">
         <p class="text-sm text-gray-600">
           Don't have an account yet?
-          <a href="#" class="font-medium text-blue-600 hover:text-blue-500">
+          <a routerLink="/auth/register" class="text-blue-600 font-medium">
             Register here
           </a>
         </p>
