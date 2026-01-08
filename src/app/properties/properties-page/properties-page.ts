@@ -32,10 +32,9 @@ export class PropertiesPage {
   properties = linkedSignal(() => this.propertiesService.propertiesResource.value()?.properties ?? []);
 
   canDelete(property?: Property): WritableSignal<boolean> {
-    console.log(property?.mine ?? false);
+    //console.log(property?.mine ?? false);
     return signal(property?.mine ?? false);
   }
-
 
   constructor() {
     effect(() => {
@@ -45,6 +44,13 @@ export class PropertiesPage {
       const id = this.provinceId();
       const selected = this.provinces().find(p => p.id === id);
       this.province.set(selected?.name || 'All');
+    });
+
+    effect(() => {
+      if (!this.authService.logged()) return;
+
+      this.propertiesResource.reload();
+      this.authService.getMe();
     });
   }
 

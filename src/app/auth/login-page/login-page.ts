@@ -58,6 +58,7 @@ export class LoginPage {
     this.authService.login(this.userLogin()).subscribe({
       next: () => {
         this.authService.getMe().subscribe(user => {
+          console.log(user);
           this.isSubmitting.set(true);
           Swal.fire('Success', 'Logged in successfully', 'success');
           this.router.navigate(['/properties']);

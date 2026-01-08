@@ -56,13 +56,15 @@ export class AuthService {
   }
 
   logout(): void {
-    this.#cookieService.delete('token', '/');
-    this.#cookieService.delete('user', '/'); // opcional, si guardas info usuario
+    this.#cookieService.delete('token');
+    this.#cookieService.delete('user'); // opcional, si guardas info usuario
     this.#logged.set(false);
+    this.#myUser.set(null);
+
 
     if (this.#isBrowser) {
       // solo navegar en el navegador, no en el server
-      this.#router.navigate(['/login']);
+      this.#router.navigate(['/auth/login']);
     }
 
     const googleAccounts = (window as any).google?.accounts?.id;
@@ -71,24 +73,28 @@ export class AuthService {
     }
   }
 
+
   isLogged(): Observable<boolean> {
     const token = this.#cookieService.get('token');
 
-    if (this.#logged()) {
-      return of(true);
-    }
+    console.log('COOKIE TOKEN:', token);
+    console.log('SIGNAL LOGGED:', this.#logged());
 
     if (!token) {
       return of(false);
     }
 
-    return this.#http.post('/auth/validate', {}).pipe(
-      map(() => {
-        this.#logged.set(true);
-        return true;
-      })
+    if (this.#logged()) {
+      return of(true);
+    }
+
+    return this.#http.get('/auth/validate').pipe(
+      tap(() => this.#logged.set(true)),
+      map(() => true),
+      catchError(() => of(false))
     );
   }
+
 
   getMe(): Observable<MyUser> {
     return this.#http.get<MyUserResponse>('/users/me').pipe(
@@ -99,5 +105,4 @@ export class AuthService {
       })
     );
   }
-
 }
