@@ -13,3 +13,19 @@ export const loginActivateGuard: CanMatchFn = () => {
     )
   );
 };
+
+//When the routes are not lazyloading we can use this
+
+// export const loginActivateGuard: CanActivateFn = (route, state) => {
+//   const authService = inject(AuthService);
+//   const router = inject(Router);
+
+//   return authService.isLogged().pipe(
+//     map(isLogged => {
+//       if (!isLogged) {
+//         return router.createUrlTree(['/auth/login']);
+//       }
+//       return true;
+//     })
+//   );
+// };
