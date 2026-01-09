@@ -51,3 +51,17 @@ export interface MyUser {
 export interface MyUserResponse {
   user: MyUser
 }
+
+export interface User{
+  id: number;
+  name: string;
+  email: string;
+  avatar: string;
+  latitude: string;
+  longitude: string;
+  me: boolean
+}
+
+export interface UserResponse{
+  user: User
+}

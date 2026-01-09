@@ -45,7 +45,7 @@ export interface PropertyFormModel {
   townId: string;     
   mainPhoto: string;
   provinceId: string; 
-}
+} 
 
 export interface ProvincesResponse{
   provinces:Province[]
@@ -61,4 +61,8 @@ export interface PropertiesResponse{
 
 export interface SinglePropertyResponse{
   property:Property
+}
+
+export interface SinglePropertyResponseInsert{
+  property:PropertyInsert
 }

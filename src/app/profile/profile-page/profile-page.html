@@ -1,0 +1,164 @@
+<main class="container mx-auto px-4 py-8 mt-16 grow flex items-center justify-center">
+
+  @if (userResource.value()?.user; as user) {
+
+    <div class="w-full max-w-2xl">
+      <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">
+        User Profile
+      </h2>
+
+      <div class="bg-white p-8 rounded-lg shadow-md">
+
+        <!-- PROFILE VIEW-->
+        @if (!showEditProfile() && !showChangePassword()) {
+          <div>
+            <div class="text-center">
+              <img
+                [src]="user"
+                alt="Avatar del usuario"
+                class="w-32 h-32 object-cover rounded-full mx-auto mb-4 border-4 border-gray-200"
+              />
+
+              <h3 class="text-2xl font-bold text-gray-800">
+                {{ user.name }}
+              </h3>
+              <p class="text-gray-500">
+                {{ user.email }}
+              </p>
+            </div>
+
+            @if (isMyProfile()) {
+              <div
+                class="mt-8 border-t border-gray-200 pt-6 flex flex-col sm:flex-row gap-4"
+              >
+                <button
+                  type="button"
+                  (click)="openEditProfile()"
+                  class="w-full bg-blue-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600"
+                >
+                  Edit profile
+                </button>
+
+                <button
+                  type="button"
+                  (click)="openChangePassword()"
+                  class="w-full bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-cyan-600"
+                >
+                  Change Password
+                </button>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- EDIT PROFILE FORM -->
+        @if (showEditProfile()) {
+          <form class="pt-4">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">
+              Edit Profile
+            </h3>
+
+            <div class="space-y-6">
+              <div>
+                <label class="block text-gray-700 font-bold mb-2">
+                  Full name
+                </label>
+                <input
+                  type="text"
+                  class="w-full px-3 py-2 border rounded-lg"
+                  [value]="user.name"
+                />
+              </div>
+
+              <div>
+                <label class="block text-gray-700 font-bold mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  class="w-full px-3 py-2 border rounded-lg"
+                  [value]="user.email"
+                />
+              </div>
+            </div>
+
+            <div class="mt-8 flex gap-4">
+              <button
+                type="submit"
+                class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg"
+              >
+                Save Changes
+              </button>
+
+              <button
+                type="button"
+                (click)="cancelForms()"
+                class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        }
+
+        <!-- CHANGE PASSWORD FORM -->
+        @if (showChangePassword()) {
+          <form class="pt-4">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">
+              Change Password
+            </h3>
+
+            <div class="space-y-6">
+              <div>
+                <label class="block text-gray-700 font-bold mb-2">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  class="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+
+              <div>
+                <label class="block text-gray-700 font-bold mb-2">
+                  Repeat Password
+                </label>
+                <input
+                  type="password"
+                  class="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+            </div>
+
+            <div class="mt-8 flex gap-4">
+              <button
+                type="submit"
+                class="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg"
+              >
+                Save Changes
+              </button>
+
+              <button
+                type="button"
+                (click)="cancelForms()"
+                class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+
+      <div class="mt-8 text-center">
+        <a
+          [routerLink]="['/properties']"
+          [queryParams]="{ seller: user.id }"
+          class="inline-block w-full sm:w-auto bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600"
+        >
+          Properties sold by this user
+        </a>
+      </div>
+    </div>
+  }
+</main>

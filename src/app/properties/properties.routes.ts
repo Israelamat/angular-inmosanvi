@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { numericIdGuard } from '../shared/guards/numeric-id-guard';
 import { leavePageGuard } from '../shared/guards/leave-page-guard';
+import { loginActivateGuard } from '../shared/guards/login-activate-guard';
 
 export const propertiesRoutes: Routes = [
   {
@@ -12,6 +13,7 @@ export const propertiesRoutes: Routes = [
   },
   {
     path: 'add',
+    canActivate: [loginActivateGuard],
     loadComponent: () =>
       import('./property-form/property-form')
         .then(m => m.PropertyForm),
@@ -25,4 +27,13 @@ export const propertiesRoutes: Routes = [
         .then(m => m.PropertyDetail),
     canActivate: [numericIdGuard],
   },
+  {
+    path: 'edit/:id',
+    canActivate: [loginActivateGuard, numericIdGuard], 
+    loadComponent: () =>
+      import('./property-form/property-form')
+        .then(m => m.PropertyForm),
+    canDeactivate: [leavePageGuard],
+    title: 'Edit property',
+  }
 ];

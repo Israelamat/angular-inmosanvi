@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
-import { Router } from '@angular/router';
-import { PropertyInsert, Province, Town, PropertyFormModel } from '../../interfaces/propoerty';
+import { ActivatedRoute, Router } from '@angular/router';
+import { PropertyInsert, Province, Town, PropertyFormModel, SinglePropertyResponse } from '../../interfaces/propoerty';
 import { FormsModule } from '@angular/forms';
+import { httpResource } from '@angular/common/http';
 import { EncodeBase64Directive } from '../../directives/encode-base64';
 import { ProvincesService } from '../../services/provinces-service';
 import { PropertiesService } from '../../services/properties-service';
 import { form, required, min, minLength, pattern, Field } from '@angular/forms/signals';
 import { CommonModule } from '@angular/common';
-import { max } from 'rxjs';
+import { finalize, max } from 'rxjs';
 import { LoadButton } from '../../load-button/load-button';
 import Swal from 'sweetalert2';
 
@@ -31,6 +32,12 @@ export class PropertyForm {
   provinceIdField = signal<string>('0');
   townIdField = signal<string>('0');
   isSubmitting = signal(false);
+
+  private route = inject(ActivatedRoute);
+  propertyId = signal<number | undefined>(undefined);
+  isEditMode = computed(() => this.propertyId() !== undefined);
+  propertyResource!: ReturnType<PropertiesService['getPropertyResource']>;
+
 
   newProperty = signal<PropertyFormModel>({
     title: '',
@@ -88,6 +95,8 @@ export class PropertyForm {
   });
 
   constructor() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) this.propertyId.set(+id);
     effect(() => {
       const resp = this.provincesService.provincesResource.value();
       if (resp) this.provinces.set(resp.provinces);
@@ -109,17 +118,37 @@ export class PropertyForm {
       this.towns.set(resp ? resp.towns : []);
     });
 
+    this.propertyResource = this.propertiesService.getPropertyResource(this.propertyId);
+
+    effect(() => {
+      const prop = this.propertyResource.value()?.property;
+      if (!prop) return;
+
+      this.newProperty.set({
+        title: prop.title,
+        description: prop.description,
+        price: prop.price,
+        address: prop.address,
+        sqmeters: prop.sqmeters,
+        numRooms: prop.numRooms,
+        numBaths: prop.numBaths,
+        townId: '' + prop.townId,
+        provinceId: '' + prop.provinceId,
+        mainPhoto: prop.mainPhoto,
+      });
+      this.imagePreview.set(prop.mainPhoto);
+    });
+
+
     effect(() => { this.pristine.set(false); });
   }
-
-  addProperty(event: Event) {
+  submitProperty(event: Event) {
     event.preventDefault();
     if (!this.isFormValid()) return;
+
     this.isSubmitting.set(true);
-    setTimeout(() => {
-    Swal.fire('Éxito', 'Propiedad guardada', 'success');
-  }, 1500);
-    const raw = this.newProperty();
+
+    const raw = this.propertyForm().value(); 
     const payload: PropertyInsert = {
       title: raw.title,
       description: raw.description,
@@ -128,23 +157,41 @@ export class PropertyForm {
       sqmeters: raw.sqmeters,
       numRooms: raw.numRooms,
       numBaths: raw.numBaths,
-      townId: +raw.townId,        // conversión a number 
+      townId: +raw.townId,
       mainPhoto: raw.mainPhoto,
-      provinceId: +raw.provinceId // conversión a number
+      provinceId: +raw.provinceId
     };
 
-    if (!this.isFormValid()) return;
+    const request = this.isEditMode()
+      ? this.propertiesService.updateProperty(this.propertyId()!, payload)
+      : this.propertiesService.addProperty(payload);
 
-    this.propertiesService.addProperty(payload).subscribe({
-      next: (created) => {
+    request.pipe(
+      finalize(() => this.isSubmitting.set(false))
+    ).subscribe({
+      next: (res) => {
         this.propertyCreated.set(true);
-        this.router.navigate(['/properties', created.property.id]);
+        Swal.fire('Success', `Property ${this.isEditMode() ? 'updated' : 'created'} successfully`, 'success');
+
+        if (this.isEditMode()) {
+          this.propertiesService.propertiesResource.reload();
+        } else {
+          this.propertiesService.propertiesResource.reload();
+        }
+
+        this.router.navigate(['/properties', res.property.id]);
       },
-      error: (err) => {console.error('Error adding property', err);
-        this.isSubmitting.set(false);
+      error: (err) => {
+        console.error('Error saving property', err);
+        if (err?.status === 403) {
+          Swal.fire('Error', 'You cannot update this property because it is not yours', 'error');
+        } else {
+          Swal.fire('Error', 'An unexpected error occurred', 'error');
+        }
       }
     });
   }
+
 
   changeImage(fileInput: HTMLInputElement) {
     if (!fileInput.files?.length) {
