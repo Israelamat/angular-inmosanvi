@@ -20,7 +20,7 @@ export const routes: Routes = [
   },  
   {
     path: 'profile',
-    canActivate: [loginActivateGuard],
+    canMatch: [],
     loadChildren: () =>
       import('./profile/profile.routes')
         .then(m => m.profileRoutes),

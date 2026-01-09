@@ -21,7 +21,7 @@ export class AuthService {
   #myUser = signal<MyUser | null>(null);
   get myUser(): Signal<MyUser | null> { return this.#myUser.asReadonly(); }
 
-  #token = signal<string | null>(null);   
+  #token = signal<string | null>(null);
   #validateInFlight: Observable<boolean> | null = null;
 
   user = computed(() => this.#myUser());
@@ -37,9 +37,16 @@ export class AuthService {
   }
 
   private setTokenAndLogged(token: string) {
-    this.#cookieService.set('token', token);
     this.#token.set(token);
     this.#logged.set(true);
+
+    if (this.#isBrowser) {
+      this.#cookieService.set('token', token, {
+        path: '/',
+        secure: false,
+        sameSite: 'Lax',
+      });
+    };
   }
 
   login(user: LoginData): Observable<TokenResponse> {
@@ -111,7 +118,7 @@ export class AuthService {
     return httpResource<UserResponse>(() => {
       const userId = id();
       if (!userId) {
-        return { url: '/users/me', method: 'GET' };
+        return { url: '/users/me', method: 'GET', };
       }
       return { url: `/users/${userId}`, method: 'GET' };
     });

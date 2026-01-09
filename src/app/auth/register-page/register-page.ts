@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy, Component, computed, effect, inject, signal
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { form, required, minLength, pattern, Field } from '@angular/forms/signals';
+import { form, required, minLength, pattern, Field, ValidationError, validate } from '@angular/forms/signals';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { EncodeBase64Directive } from '../../directives/encode-base64';
@@ -41,10 +41,21 @@ export class RegisterPage {
     required(schema.name, { message: 'Full name is required' });
     minLength(schema.name, 3, { message: 'Name must be at least 3 characters' });
     required(schema.email, { message: 'Email is required' });
-    pattern(schema.email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/, {message: 'Invalid email format'});
+    pattern(schema.email, /^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: 'Invalid email format' });
     required(schema.password, { message: 'Password is required' });
-    minLength(schema.password, 6, {message: 'Password must be at least 6 characters'});
+    minLength(schema.password, 4, { message: 'Password must be at least 4 characters' });
+    required(schema.passwordConfirm, { message: 'Please repeat the same password' });
     required(schema.avatar, { message: 'Avatar is required' });
+    validate(schema.passwordConfirm, ({value, valueOf}) => {
+      const email = valueOf(schema.password);
+      if(value() !== email) {
+        return {
+          kind: 'samePassword',
+          message: 'Passwords are not equal'
+        }
+      }
+      return null;
+    })
   });
 
   isFormValid = computed(() => {
@@ -70,52 +81,74 @@ export class RegisterPage {
     });
   }
 
-  register(event: Event) {
-    event.preventDefault();
-    if (!this.isFormValid()) return;
+ passwordsMatchValidator(schema: {
+    password: any;
+    passwordConfirm: any;
+  }): ValidationError[] {
+  const password = schema.password.value();
+  const confirm = schema.passwordConfirm.value();
 
-    this.isSubmitting.set(true);
+  if (!password || !confirm) return [];
 
-    const raw = this.newUser();
-
-    const payload = {
-      name: raw.name,
-      email: raw.email,
-      password: raw.password,
-      passwordConfirm: raw.passwordConfirm,
-      avatar: raw.avatar
-    };
-
-    this.authService.register(payload).subscribe({
-      next: () => {
-        this.userCreated.set(true);
-        Swal.fire('Success', 'Account created successfully', 'success');
-        this.router.navigate(['/login']);
-      },
-      error: (err) => {
-        console.error('Register error', err);
-        Swal.fire('Error', 'Could not create account', 'error');
-        this.isSubmitting.set(false);
+  if (password !== confirm) {
+    return [
+      {
+        kind: 'passwordMismatch',
+        message: 'Passwords do not match'
       }
-    });
+    ];
   }
 
-  changeAvatar(fileInput: HTMLInputElement) {
-    if (!fileInput.files?.length) {
-      this.avatarPreview.set('');
-      this.newUser.update(u => ({ ...u, avatar: '' }));
-      fileInput.value = '';
-      return;
+  return [];
+}
+
+
+register(event: Event) {
+  event.preventDefault();
+  if (!this.isFormValid()) return;
+
+  this.isSubmitting.set(true);
+
+  const raw = this.newUser();
+
+  const payload = {
+    name: raw.name,
+    email: raw.email,
+    password: raw.password,
+    passwordConfirm: raw.passwordConfirm,
+    avatar: raw.avatar
+  };
+
+  this.authService.register(payload).subscribe({
+    next: () => {
+      this.userCreated.set(true);
+      Swal.fire('Success', 'Account created successfully', 'success');
+      this.router.navigate(['/login']);
+    },
+    error: (err) => {
+      console.error('Register error', err);
+      Swal.fire('Error', 'Could not create account', 'error');
+      this.isSubmitting.set(false);
     }
+  });
+}
 
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      const base64 = reader.result as string;
-      this.avatarPreview.set(base64);
-      this.newUser.update(u => ({ ...u, avatar: base64 }));
-    };
+changeAvatar(fileInput: HTMLInputElement) {
+  if (!fileInput.files?.length) {
+    this.avatarPreview.set('');
+    this.newUser.update(u => ({ ...u, avatar: '' }));
+    fileInput.value = '';
+    return;
   }
+
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+
+  reader.readAsDataURL(file);
+  reader.onload = () => {
+    const base64 = reader.result as string;
+    this.avatarPreview.set(base64);
+    this.newUser.update(u => ({ ...u, avatar: base64 }));
+  };
+}
 }
