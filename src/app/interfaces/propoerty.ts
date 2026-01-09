@@ -31,6 +31,7 @@ export interface PropertyInsert {
   townId: number;
   mainPhoto: string;
   provinceId: number;
+  town?: Town | null;
   mine?: boolean
 }
 
