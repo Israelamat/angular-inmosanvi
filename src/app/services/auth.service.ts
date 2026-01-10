@@ -93,10 +93,7 @@ export class AuthService {
     const validate = this.#http.get('/auth/validate').pipe(
       tap(() => this.#logged.set(true)),
       map(() => true),
-      catchError(() => {
-        this.#logged.set(false);
-        return of(false);
-      }),
+      catchError(() => of(false)),
       finalize(() => { this.#validateInFlight = null; })
     );
 
@@ -112,15 +109,5 @@ export class AuthService {
         this.#logged.set(true);
       })
     );
-  }
-
-  getProfileResource(id: Signal<number>) {
-    return httpResource<UserResponse>(() => {
-      const userId = id();
-      if (!userId) {
-        return { url: '/users/me', method: 'GET', };
-      }
-      return { url: `/users/${userId}`, method: 'GET' };
-    });
   }
 }

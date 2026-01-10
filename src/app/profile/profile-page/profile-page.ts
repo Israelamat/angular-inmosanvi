@@ -1,7 +1,9 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, PLATFORM_ID, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../interfaces/auth';
+import { ProfileService } from '../../services/profile.service';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-profile-page',
@@ -12,24 +14,57 @@ import { User } from '../../interfaces/auth';
 export class ProfilePage {
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
+  private profileService = inject(ProfileService);
 
   private userId = signal<number>(0);
-
+  private profileUser = signal<User | null>(null);
+  private platformId = inject(PLATFORM_ID);
 
   showEditProfile = signal(false);
   showChangePassword = signal(false);
 
-  userResource = this.authService.getProfileResource(this.userId);;
+  userResource = this.profileService.getProfileResource(this.profileUser);
+  private loggedInUser: User | null = null;
 
- isMyProfile = computed(() => {
-    const user = this.userResource.value();
-    return user && user.user.id === this.authService.userId();
+
+  isMyProfile = computed(() => {
+    return this.profileUser()?.id === this.authService.userId();
+
   });
 
   constructor() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.userId.set(+id);
+      this.profileService.getById(+id).subscribe(res => {
+        this.profileUser.set(res.user);
+      });
+    } else {
+      this.profileService.getMe().subscribe(res => {
+        this.profileUser.set(res.user);
+      });
+    }
+
+    if (isPlatformBrowser(this.platformId)) {
+      this.authService.isLogged().subscribe(logged => {
+        if (logged) {
+          this.authService.getMe().subscribe(user => {
+            console.log('Logged in user:', user);
+            this.loggedInUser = user; // usuario logueado
+          });
+        }
+      });
+
+      const idParam = this.route.snapshot.paramMap.get('id');
+      if (idParam) {
+        this.profileService.getById(+idParam).subscribe(res => {
+          console.log('Profile loaded:', res.user);
+          this.profileUser.set(res.user);
+        });
+      } else {
+        this.authService.getMe().subscribe(res => {
+          this.profileUser.set(res);
+        });
+      }
     }
   }
 

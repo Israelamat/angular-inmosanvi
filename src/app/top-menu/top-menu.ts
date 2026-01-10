@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
@@ -14,9 +14,10 @@ export class TopMenu {
   private router = inject(Router);
   private authService = inject(AuthService);
 
+  isLogged = computed(() => this.authService.logged());
+
   logout = () => {
     this.authService.logout();
     this.router.navigate(['/auth/login']);
   }
-
 }

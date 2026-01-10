@@ -6,6 +6,12 @@
             <use href="icons/close.svg#close"></use>
         </svg>
     </button>
+    <a [routerLink]="['/properties/edit', property.id]" class="absolute right-8 -top-3 rounded-full text-white bg-blue-700 p-1 shadow-md hover:bg-blue-600">
+        <svg width="24" height="24">
+            <use href="icons/edit.svg#edit"></use>
+        </svg>
+    </a>
+
     }
     <a [routerLink]="['/properties', property.id]">
         <img [src]="property.mainPhoto" alt="Photo of the property" class="w-full aspect-16/10 object-cover">

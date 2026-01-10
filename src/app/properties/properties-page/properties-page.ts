@@ -7,6 +7,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProvincesService } from '../../services/provinces-service';
 import { AuthService } from '../../services/auth.service';
 import { map, Observable } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'properties-page',
@@ -72,10 +73,20 @@ export class PropertiesPage {
   });
 
   deleteProperty(id?: number) {
-    if (!id) return;
-
-    this.propertiesService.deleteProperty(id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe();
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (!id) return;
+        this.propertiesService.deleteProperty(id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe();
+      }
+    })
   }
 }

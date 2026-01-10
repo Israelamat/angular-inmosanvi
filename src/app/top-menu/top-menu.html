@@ -9,16 +9,36 @@
       <a routerLink="/properties" routerLinkActive="font-semibold" class="text-gray-600 hover:text-gray-900">
         Home
       </a>
-
+      @if (isLogged()) {
       <a routerLink="/properties/add" routerLinkActive="font-semibold" class="text-gray-600 hover:text-gray-900">
         New Property
       </a>
 
-      <a (click)="logout()" title="login" class="text-gray-600 hover:text-gray-900">
+      <a routerLink="/profile" title="Profile" class="text-gray-600 hover:text-gray-900">
+        <svg class="icon" width="24" height="24">
+          <use href="icons/profile.svg#profile"></use>
+        </svg>
+      </a>
+
+      <a (click)="logout()" title="Logout" class="text-gray-600 hover:text-gray-900 cursor-pointer">
+        <svg class="icon" width="24" height="24">
+          <use href="icons/logout.svg#logout"></use>
+        </svg>
+      </a>
+      } @else {
+      <a routerLink="/login" title="Login" class="text-gray-600 hover:text-gray-900">
         <svg class="icon" width="24" height="24">
           <use href="icons/login.svg#login"></use>
         </svg>
       </a>
+
+      <a routerLink="/register" title="Register" class="text-gray-600 hover:text-gray-900">
+        <svg class="icon" width="24" height="24">
+          <use href="icons/register.svg#register"></use>
+        </svg>
+      </a>
+
+      }
     </nav>
   </div>
 </header>
