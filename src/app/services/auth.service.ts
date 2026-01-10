@@ -101,13 +101,19 @@ export class AuthService {
     return validate;
   }
 
-  getMe(): Observable<MyUser> {
-    return this.#http.get<MyUserResponse>('/users/me').pipe(
-      map(res => res.user),
-      tap(user => {
-        this.#myUser.set(user);
-        this.#logged.set(true);
-      })
-    );
-  }
+  getMe(): Observable<MyUser | null> {
+  return this.#http.get<MyUserResponse>('/users/me').pipe(
+    map(res => res.user),
+    tap(user => {
+      this.#myUser.set(user);
+      this.#logged.set(true);
+    }),
+    catchError(err => {
+      //avoid unexpected unauthorized errors
+      this.#myUser.set(null);
+      this.#logged.set(false);
+      return of(null);
+    })
+  );
+}
 }

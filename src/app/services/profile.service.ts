@@ -17,12 +17,9 @@ export class ProfileService {
   }
 
   getProfileResource(user: Signal<User | null>) {
-    return httpResource<UserResponse>(() => {
+    return httpResource<UserResponse | undefined>(() => {
       const userId = user()?.id;
-
-      if (!userId) {
-        return { url: '/users/me', method: 'GET' };
-      }
+      if (!userId) return undefined;
 
       return { url: `/users/${userId}`, method: 'GET' };
     });

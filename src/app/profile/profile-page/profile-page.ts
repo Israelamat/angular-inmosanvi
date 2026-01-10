@@ -1,9 +1,10 @@
 import { Component, computed, effect, inject, PLATFORM_ID, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { User } from '../../interfaces/auth';
+import { User, UserResponse } from '../../interfaces/auth';
 import { ProfileService } from '../../services/profile.service';
 import { isPlatformBrowser } from '@angular/common';
+import { HttpResourceRef } from '@angular/common/http';
 
 @Component({
   selector: 'app-profile-page',
@@ -23,7 +24,7 @@ export class ProfilePage {
   showEditProfile = signal(false);
   showChangePassword = signal(false);
 
-  userResource = this.profileService.getProfileResource(this.profileUser);
+  //userResource = this.profileService.getProfileResource(this.profileUser);
   private loggedInUser: User | null = null;
 
 
@@ -32,15 +33,19 @@ export class ProfilePage {
 
   });
 
+  userResource!: HttpResourceRef<UserResponse | undefined>;
+
   constructor() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.profileService.getById(+id).subscribe(res => {
-        this.profileUser.set(res.user);
+    const idParam = this.route.snapshot.paramMap.get('id');
+    this.userResource = this.profileService.getProfileResource(this.profileUser);
+
+    if (idParam) {
+      this.profileService.getById(+idParam).subscribe(res => {
+        this.profileUser.set(res.user); 
       });
     } else {
-      this.profileService.getMe().subscribe(res => {
-        this.profileUser.set(res.user);
+      this.authService.getMe().subscribe(res => {
+        this.profileUser.set(res);    
       });
     }
 
@@ -48,23 +53,10 @@ export class ProfilePage {
       this.authService.isLogged().subscribe(logged => {
         if (logged) {
           this.authService.getMe().subscribe(user => {
-            console.log('Logged in user:', user);
-            this.loggedInUser = user; // usuario logueado
+            this.loggedInUser = user;
           });
         }
       });
-
-      const idParam = this.route.snapshot.paramMap.get('id');
-      if (idParam) {
-        this.profileService.getById(+idParam).subscribe(res => {
-          console.log('Profile loaded:', res.user);
-          this.profileUser.set(res.user);
-        });
-      } else {
-        this.authService.getMe().subscribe(res => {
-          this.profileUser.set(res);
-        });
-      }
     }
   }
 
