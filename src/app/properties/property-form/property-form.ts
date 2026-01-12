@@ -132,7 +132,7 @@ export class PropertyForm {
         sqmeters: prop.sqmeters,
         numRooms: prop.numRooms,
         numBaths: prop.numBaths,
-        townId: '' + prop.townId,
+        townId: '' + prop.town?.id,
         provinceId: '' + prop.provinceId,
         mainPhoto: prop.mainPhoto,
       });

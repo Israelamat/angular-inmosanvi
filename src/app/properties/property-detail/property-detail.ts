@@ -1,17 +1,25 @@
-import {ChangeDetectionStrategy,Component,computed,effect,inject,input,numberAttribute,signal} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, numberAttribute, signal } from '@angular/core';
 import { PropertiesService } from '../../services/properties-service';
 import { Property } from '../../interfaces/propoerty';
 import { FormsModule } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
+import { MortgageCalculator } from '../mortgage-calculator/mortgage-calculator';
+import { PropertyComments } from '../property-comments/property-comments';
+import { StarRating } from '../../shared/star-rating/star-rating';
+import { OlMap } from '../../ol-maps/ol-map';
+import { OlMarker } from '../../ol-maps/ol-marker';
 
 @Component({
   selector: 'app-property-detail',
-  imports: [FormsModule],
+  imports: [FormsModule, MortgageCalculator, PropertyComments, StarRating, OlMap, OlMarker],
   templateUrl: './property-detail.html',
   styleUrl: './property-detail.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PropertyDetail {
+
+  coordinates = signal<[number, number]>([-0.5, 38.5]);
+
   id = input.required({ transform: numberAttribute });
 
   private propertiesService = inject(PropertiesService);

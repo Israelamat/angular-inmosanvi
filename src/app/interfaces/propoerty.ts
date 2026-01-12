@@ -1,3 +1,5 @@
+import { User } from "./auth";
+
 export interface Property extends Omit<PropertyInsert, 'townId'> {
   id: number;
   createdAt: string;
@@ -66,4 +68,22 @@ export interface SinglePropertyResponse{
 
 export interface SinglePropertyResponseInsert{
   property:PropertyInsert
+}
+
+export interface Rating {
+  id: number;
+  rating: number;
+  comment: string;
+  property: number;
+  user: User;
+}
+
+export interface RatingsResponse {
+  ratings: Rating[];
+}
+
+export interface RatingInsert {
+  property: number;
+  rating: number;
+  comment: string;
 }

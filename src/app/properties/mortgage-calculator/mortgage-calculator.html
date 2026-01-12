@@ -1,0 +1,37 @@
+<div class="bg-white p-6 rounded-lg shadow-md">
+  <h3 class="text-xl font-bold mb-4">Calculate Your Mortgage</h3>
+
+  <form (submit)="calculate(); $event.preventDefault()" class="space-y-4">
+    <div>
+      <label>Property price (€)</label>
+      <input type="number" [value]="price" readonly class="w-full" />
+    </div>
+
+    <div>
+      <label>Down payment (€)</label>
+      <input type="number" [value]="downPayment()" (input)="downPayment.set(+$any($event.target).value || 0)"
+        class="w-full" />
+    </div>
+
+    <div>
+      <label>Loan term (years)</label>
+      <input type="number" [value]="loanTerm()" (input)="loanTerm.set(+$any($event.target).value || 0)" min="1" max="40"
+        class="w-full" />
+    </div>
+
+    <div>
+      <label>Annual interest rate (%)</label>
+      <input type="number" [value]="interestRate()" (input)="interestRate.set(+$any($event.target).value || 0)"
+        step="0.01" class="w-full" />
+    </div>
+
+    <button type="submit" class="w-full bg-green-500 text-white py-2 rounded">Calculate monthly payment</button>
+  </form>
+
+  @if (monthlyPayment()) {
+  <div class="mt-4">
+    <p class="text-gray-600">Approximate monthly payment:</p>
+    <p class="text-2xl font-bold">{{ monthlyPayment() }}</p>
+  </div>
+  }
+</div>

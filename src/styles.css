@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@import "ol/ol.css";
+@import "@geoapify/geocoder-autocomplete/styles/minimal.css";
+
+
 :is(input,textarea,select) {
   @apply border rounded-md;
 
@@ -19,3 +23,19 @@
   }
 }
 
+.autocomplete-container {
+    position: relative;
+}
+
+.geoapify-autocomplete-input {
+    border: none;
+}
+
+.geoapify-input-wrapper {
+    border: 1px #ddd solid;
+}
+
+.ol-map-container {
+  width: 100%;
+  height: 400px; /* Ajusta según lo que necesites */
+}

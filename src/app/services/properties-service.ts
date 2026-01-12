@@ -1,7 +1,7 @@
 import { Injectable, Signal, computed, inject, linkedSignal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 
-import { PropertiesResponse, Property, PropertyInsert, SinglePropertyResponse, SinglePropertyResponseInsert } from './../interfaces/propoerty';
+import { PropertiesResponse, Property, PropertyInsert, RatingsResponse, SinglePropertyResponse, SinglePropertyResponseInsert } from './../interfaces/propoerty';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import Swal from 'sweetalert2';
 
@@ -62,7 +62,7 @@ export class PropertiesService {
   }
 
   getPropertyResource(id: Signal<number | undefined>) {
-    return httpResource<SinglePropertyResponseInsert>(() => {
+    return httpResource<SinglePropertyResponse>(() => {
       const propertyId = id();
       if (!propertyId) return undefined;
       return { url: `/properties/${propertyId}`, method: 'GET' };
@@ -76,5 +76,20 @@ export class PropertiesService {
   getPropertiesSearchResource(search: Signal<string>) {
     const queryParams = computed(() => new URLSearchParams({ search: search() }));
     return httpResource<PropertiesResponse>(() => `properties?${queryParams()}`);
+  }
+
+  getPropertyRatings(id: number) {
+    return this.#http.get<RatingsResponse>(`/properties/${id}/ratings`).pipe(
+      catchError(err => {
+        console.error(err);
+        Swal.fire('Error', 'Error al obtener las calificaciones', 'error');
+        return throwError(() => err);
+      }
+      )
+    );
+  }
+
+  addPropertyRating(rating: { property: number; rating: number; comment: string }) {
+    return this.#http.post(`/properties/${rating.property}/ratings`, rating);
   }
 }
