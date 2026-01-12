@@ -1,4 +1,4 @@
-import { Injectable, Signal, inject, linkedSignal } from '@angular/core';
+import { Injectable, Signal, computed, inject, linkedSignal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 
 import { PropertiesResponse, Property, PropertyInsert, SinglePropertyResponse, SinglePropertyResponseInsert } from './../interfaces/propoerty';
@@ -23,6 +23,23 @@ export class PropertiesService {
   readonly properties = linkedSignal(
     () => this.propertiesResource.value()?.properties ?? []
   );
+
+  getPropertiesResource(
+    search: Signal<string>,
+    provinceId: Signal<number>,
+    page: Signal<number>
+  ) {
+    return httpResource<PropertiesResponse>(() => {
+      const params = new URLSearchParams();
+      if (search()) params.set('search', search());
+      if (provinceId() !== 0) params.set('provinceId', provinceId().toString());
+      params.set('page', page().toString());
+      const url = `/properties?${params.toString()}`;
+      console.log('Resource URL:', url);
+      return url;
+    });
+  }
+
 
   addProperty(property: PropertyInsert): Observable<SinglePropertyResponse> {
     return this.#http
@@ -53,6 +70,11 @@ export class PropertiesService {
   }
 
   updateProperty(id: number, property: PropertyInsert): Observable<SinglePropertyResponse> {
-  return this.#http.put<SinglePropertyResponse>(`/properties/${id}`, property);
-}
+    return this.#http.put<SinglePropertyResponse>(`/properties/${id}`, property);
+  }
+
+  getPropertiesSearchResource(search: Signal<string>) {
+    const queryParams = computed(() => new URLSearchParams({ search: search() }));
+    return httpResource<PropertiesResponse>(() => `properties?${queryParams()}`);
+  }
 }

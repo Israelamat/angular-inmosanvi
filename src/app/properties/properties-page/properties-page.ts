@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, linkedSignal, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PropertiesService } from '../../services/properties-service';
-import { Property, Province, Town } from '../../interfaces/propoerty';
+import { PropertiesResponse, Property, Province, Town } from '../../interfaces/propoerty';
 import { PropertyCard } from '../property-card/property-card';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProvincesService } from '../../services/provinces-service';
 import { AuthService } from '../../services/auth.service';
-import { map, Observable } from 'rxjs';
+import { debounce, debounceTime, map, Observable } from 'rxjs';
 import Swal from 'sweetalert2';
+import { form } from '@angular/forms/signals';
 
 @Component({
   selector: 'properties-page',
@@ -28,14 +29,31 @@ export class PropertiesPage {
   towns = signal<Town[]>([]);
   provinceId = signal(0);
   provinces = signal<Province[]>([]);
+  page = signal(1);
 
-  propertiesResource = this.propertiesService.propertiesResource;
-  properties = linkedSignal(() => this.propertiesService.propertiesResource.value()?.properties ?? []);
+  searchField = form(this.search, schema => {
+    return debounceTime(600);
+  });
 
-  canDelete(property?: Property): WritableSignal<boolean> {
-    //console.log(property?.mine ?? false);
-    return signal(property?.mine ?? false);
-  }
+  propertiesResource = this.propertiesService.getPropertiesResource(this.search, this.provinceId,
+    this.page);
+
+  properties = linkedSignal<PropertiesResponse | undefined, Property[]>({
+    source: () => this.propertiesResource.value(),
+    computation: (resp, previous) => {
+      if (!resp) return previous?.value ?? [];
+
+      return this.page() > 1 && previous
+        ? previous.value.concat(resp.properties)
+        : resp.properties;
+    }
+  });
+
+  provinceName = computed(() => {
+    const id = this.provinceId();
+    const provinces = this.provinces();
+    return provinces.find(p => p.id === id)?.name ?? 'All';
+  });
 
   constructor() {
     effect(() => {
@@ -55,22 +73,37 @@ export class PropertiesPage {
     });
   }
 
+  onProvinceChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const value = Number(select.value);
+    this.provinceId.set(Number.isNaN(value) ? 0 : value);
+    console.log('Selected provinceId numeric:', this.provinceId());
+  }
 
-  filteredProperties = computed(() => {
-    const text = (this.search() ?? '').toLowerCase().trim();
-    const selectedProvinceId = this.provinceId();
+  onSearchInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.search.set(input.value);
+  }
 
-    return this.properties().filter((p: Property) => {
-      const propTitle = (p.title ?? '').toLowerCase();
-      const propAddress = (p.address ?? '').toLowerCase();
-      const propProvinceId = p.town?.province?.id ?? 0;
+  // filteredProperties = computed(() => {
+  //   const text = (this.search() ?? '').toLowerCase().trim();
+  //   const selectedProvinceId = this.provinceId();
 
-      const matchSearch = propTitle.includes(text) || propAddress.includes(text);
-      const matchProvince = selectedProvinceId === 0 || propProvinceId === selectedProvinceId;
+  //   return this.properties().filter((p: Property) => {
+  //     const propTitle = (p.title ?? '').toLowerCase();
+  //     const propAddress = (p.address ?? '').toLowerCase();
+  //     const propProvinceId = p.town?.province?.id ?? 0;
 
-      return matchSearch && matchProvince;
-    });
-  });
+  //     const matchSearch = propTitle.includes(text) || propAddress.includes(text);
+  //     const matchProvince = selectedProvinceId === 0 || propProvinceId === selectedProvinceId;
+
+  //     return matchSearch && matchProvince;
+  //   });
+  // });
+
+  loadMore() {
+    this.page.update(p => p + 1);
+  }
 
   deleteProperty(id?: number) {
     Swal.fire({
@@ -88,5 +121,9 @@ export class PropertiesPage {
           .subscribe();
       }
     })
+  }
+
+  canDelete(property?: Property): WritableSignal<boolean> {
+    return signal(property?.mine ?? false);
   }
 }
