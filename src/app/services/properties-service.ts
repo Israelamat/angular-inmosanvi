@@ -78,11 +78,11 @@ export class PropertiesService {
     return httpResource<PropertiesResponse>(() => `properties?${queryParams()}`);
   }
 
-  getPropertyRatings(id: number) {
+  getPropertyRatings(id:number): Observable<RatingsResponse> {
     return this.#http.get<RatingsResponse>(`/properties/${id}/ratings`).pipe(
       catchError(err => {
         console.error(err);
-        Swal.fire('Error', 'Error al obtener las calificaciones', 'error');
+        Swal.fire('Error', 'Could not get property ratings', 'error');
         return throwError(() => err);
       }
       )

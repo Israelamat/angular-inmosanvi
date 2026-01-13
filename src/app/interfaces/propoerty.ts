@@ -7,8 +7,6 @@ export interface Property extends Omit<PropertyInsert, 'townId'> {
   town: Town | null;
 }
 
-
-
 export interface Province{
   id: number,
   name: string

@@ -1,36 +1,41 @@
 <div class="bg-white p-6 rounded-lg shadow-md space-y-6">
-
-    <h3 class="text-xl font-bold text-gray-800 mb-4">Ratings & Comments</h3>
-
-    <!-- Formulario para añadir comentario -->
-    <form (submit)="addRating(); $event.preventDefault()" class="space-y-4">
-        <div>
-            <label class="block text-gray-700 font-bold mb-1">Your rating</label>
-            @for (r of ratings(); track r.id) {
-            <app-star-rating [ratings]="r.rating" size="small" [interactive]="false">
-            </app-star-rating>
-            }
-
-        </div>
-        <div>
-            <label class="block text-gray-700 font-bold mb-1">Comment</label>
-            <textarea [value]="newComment()" (input)="newComment.set($any($event.target).value)" rows="3"
-                class="w-full border rounded p-2" required></textarea>
-        </div>
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
-    </form>
-
-    <!-- Lista de comentarios -->
-    @for (rating of ratings(); track rating.id) {
-    <div class="border-t border-gray-200 pt-4 flex gap-4">
-        <img [src]="rating.user.avatar" alt="User avatar" class="w-12 h-12 rounded-full object-cover">
-        <div class="grow">
-            <div class="flex justify-between items-center mb-1">
-                <p class="font-bold">{{ rating.user.name }}</p>
-                <app-star-rating [size]="'small'" [interactive]="false" [ratings]="rating.rating"></app-star-rating>
-            </div>
-            <p class="text-gray-600 whitespace-pre-wrap">{{ rating.comment }}</p>
-        </div>
+  <h3 class="text-xl font-bold text-gray-800 mb-4">Ratings & Comments</h3>
+  <form (submit)="addRating(); $event.preventDefault()" class="space-y-4">
+    <div>
+      <label class="block text-gray-700 font-bold mb-1">Your rating</label>
+      <div class="flex gap-1">
+        @for (i of stars; track i){
+        <span (click)="setRating(i)" class="cursor-pointer">
+          <svg class="icon" [class.text-yellow-400]="i <= newRating()" [class.text-gray-300]="i > newRating()"
+            [class.w-5]="size === 'small'" [class.h-5]="size === 'small'" [class.w-10]="size === 'large'"
+            [class.h-10]="size === 'large'">
+            <use href="icons/star.svg#star"></use>
+          </svg>
+        </span>
+        }
+      </div>
     </div>
-    }
+
+    <div>
+      <label class="block text-gray-700 font-bold mb-1">Comment</label>
+      <textarea [value]="newComment()" (input)="newComment.set($any($event.target).value)" rows="3"
+        class="w-full border rounded p-2" required>
+      </textarea>
+    </div>
+
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
+  </form>
+
+  @for (rating of ratings(); track rating.id) {
+  <div class="border-t border-gray-200 pt-4 flex gap-4">
+    <img [src]="rating.user.avatar" alt="User avatar" class="w-12 h-12 rounded-full object-cover">
+    <div class="grow">
+      <div class="flex justify-between items-center mb-1">
+        <p class="font-bold">{{ rating.user.name }}</p>
+        <app-star-rating [size]="'small'" [interactive]="false" [ratings]="rating.rating"></app-star-rating>
+      </div>
+      <p class="text-gray-600 whitespace-pre-wrap">{{ rating.comment }}</p>
+    </div>
+  </div>
+  }
 </div>

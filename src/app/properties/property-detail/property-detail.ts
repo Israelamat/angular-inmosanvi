@@ -11,15 +11,12 @@ import { OlMarker } from '../../ol-maps/ol-marker';
 
 @Component({
   selector: 'app-property-detail',
-  imports: [FormsModule, MortgageCalculator, PropertyComments, StarRating, OlMap, OlMarker],
+  imports: [FormsModule, MortgageCalculator, PropertyComments, OlMap, OlMarker],
   templateUrl: './property-detail.html',
   styleUrl: './property-detail.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PropertyDetail {
-
-  coordinates = signal<[number, number]>([-0.5, 38.5]);
-
   id = input.required({ transform: numberAttribute });
 
   private propertiesService = inject(PropertiesService);
@@ -28,6 +25,7 @@ export class PropertyDetail {
   propertyResource = this.propertiesService.getPropertyResource(this.id);
   property = computed(() => this.propertyResource.value()?.property);
 
+  coordinates = signal<[number, number]>([-0.5, 38.5]);
   downPayment = signal(0);
   loanTerm = signal(30);
   interestRate = signal(3.5);
@@ -38,6 +36,13 @@ export class PropertyDetail {
       const prop = this.property();
       if (prop) {
         this.titleService.setTitle(prop.title);
+
+        if (prop.town) {
+          this.coordinates.set([
+            parseFloat(prop.town.longitude),
+            parseFloat(prop.town.latitude)
+          ]);
+        }
       }
     });
   }

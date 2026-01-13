@@ -7,7 +7,7 @@ import { Component, Input, signal } from '@angular/core';
   styleUrl: './mortgage-calculator.css',
 })
 export class MortgageCalculator {
-   @Input() price: number | undefined;
+  @Input() price: number | undefined; //do not need reactivity 
 
   downPayment = signal(0);
   loanTerm = signal(30);
