@@ -21,4 +21,8 @@ export class PropertyCard {
   deleteProperty() {
     this.deleted.emit(this.property.id);
   }
+
+  constructor(){
+    console.log(this.canDelete());
+  }
 }

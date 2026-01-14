@@ -93,7 +93,11 @@ export class AuthService {
     const validate = this.#http.get('/auth/validate').pipe(
       tap(() => this.#logged.set(true)),
       map(() => true),
-      catchError(() => of(false)),
+      catchError(() => {
+        this.#logged.set(false);
+        localStorage.removeItem('token');
+        return of(false);
+      }),
       finalize(() => { this.#validateInFlight = null; })
     );
 
@@ -102,18 +106,18 @@ export class AuthService {
   }
 
   getMe(): Observable<MyUser | null> {
-  return this.#http.get<MyUserResponse>('/users/me').pipe(
-    map(res => res.user),
-    tap(user => {
-      this.#myUser.set(user);
-      this.#logged.set(true);
-    }),
-    catchError(err => {
-      //avoid unexpected unauthorized errors
-      this.#myUser.set(null);
-      this.#logged.set(false);
-      return of(null);
-    })
-  );
-}
+    return this.#http.get<MyUserResponse>('/users/me').pipe(
+      map(res => res.user),
+      tap(user => {
+        this.#myUser.set(user);
+        this.#logged.set(true);
+      }),
+      catchError(err => {
+        //avoid unexpected unauthorized errors
+        this.#myUser.set(null);
+        this.#logged.set(false);
+        return of(null);
+      })
+    );
+  }
 }

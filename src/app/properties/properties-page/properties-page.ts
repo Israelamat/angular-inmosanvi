@@ -40,7 +40,7 @@ export class PropertiesPage {
   });
 
   propertiesResource = this.propertiesService.getPropertiesResource(this.search, this.provinceId,
-    this.page, this.sellerId);
+    this.page,   this.sellerId);
 
   properties = linkedSignal<PropertiesResponse | undefined, Property[]>({
     source: () => this.propertiesResource.value(),
@@ -60,6 +60,8 @@ export class PropertiesPage {
   });
 
   constructor() {
+    this.authService.isLogged().subscribe();  //Handle page reload
+
     effect(() => {
       const resp = this.provincesService.provincesResource.value();
       if (resp) this.provinces.set(resp.provinces);
