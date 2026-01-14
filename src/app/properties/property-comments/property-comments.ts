@@ -2,6 +2,7 @@ import { Component, effect, inject, input, Input, Output, Signal, signal } from 
 import { Rating, RatingsResponse } from '../../interfaces/propoerty';
 import { PropertiesService } from '../../services/properties-service';
 import { StarRating } from '../../shared/star-rating/star-rating';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-property-comments',
@@ -10,7 +11,6 @@ import { StarRating } from '../../shared/star-rating/star-rating';
   styleUrl: './property-comments.css',
 })
 export class PropertyComments {
-
   propertyId = input.required<number>();
   private propertiesService = inject(PropertiesService);
 
@@ -37,8 +37,10 @@ export class PropertyComments {
   }
 
   addRating() {
-    if (this.newRating() <= 0 || this.newComment().trim() === '') return;
-
+    if (this.newRating() <= 0 || this.newComment().trim() === ''){
+      Swal.fire('Error', 'Please enter a rating and comment', 'error');
+      return;
+    }
     this.propertiesService.addPropertyRating({
       property: this.propertyId(),
       rating: this.newRating(),

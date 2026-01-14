@@ -5,12 +5,9 @@
       <label class="block text-gray-700 font-bold mb-1">Your rating</label>
       <div class="flex gap-1">
         @for (i of stars; track i){
-        <span (click)="setRating(i)" class="cursor-pointer">
-          <svg class="icon" [class.text-yellow-400]="i <= newRating()" [class.text-gray-300]="i > newRating()"
-            [class.w-5]="size === 'small'" [class.h-5]="size === 'small'" [class.w-10]="size === 'large'"
-            [class.h-10]="size === 'large'">
-            <use href="icons/star.svg#star"></use>
-          </svg>
+        <span (click)="setRating(i)" class="cursor-pointer text-3xl" [class.text-yellow-400]="i <= newRating()"
+          [class.text-gray-300]="i > newRating()">
+          ★
         </span>
         }
       </div>

@@ -1,9 +1,13 @@
 <div class="inline-flex items-center gap-1" [class.pointer-events-none]="!interactive">
+
   @for (s of stars(); track s) {
-    <button type="button" (click)="onClick(s)" [attr.aria-label]="'Rate '+s" class="bg-transparent border-0 p-0">
-      <span class="@if(size==='large'; 'text-3xl')" [class]="starClass(s)">
-        ★
-      </span>
-    </button>
+  <button type="button" (click)="onClick(s)" [attr.aria-label]="'Rate ' + s" class="bg-transparent border-0 p-0">
+
+    <span class="cursor-pointer" [class.text-3xl]="size === 'large'" [class.text-yellow-400]="s <= ratings"
+      [class.text-gray-300]="s > ratings">
+      ★
+    </span>
+
+  </button>
   }
 </div>

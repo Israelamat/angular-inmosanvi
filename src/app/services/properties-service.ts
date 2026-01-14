@@ -78,10 +78,9 @@ export class PropertiesService {
     return httpResource<PropertiesResponse>(() => `properties?${queryParams()}`);
   }
 
-  getPropertyRatings(id:number): Observable<RatingsResponse> {
+  getPropertyRatings(id: number): Observable<RatingsResponse> {
     return this.#http.get<RatingsResponse>(`/properties/${id}/ratings`).pipe(
       catchError(err => {
-        console.error(err);
         Swal.fire('Error', 'Could not get property ratings', 'error');
         return throwError(() => err);
       }
@@ -90,6 +89,13 @@ export class PropertiesService {
   }
 
   addPropertyRating(rating: { property: number; rating: number; comment: string }) {
-    return this.#http.post(`/properties/${rating.property}/ratings`, rating);
+    return this.#http.post(`/properties/${rating.property}/ratings`, rating).pipe(
+      catchError(err => {
+        const message = err?.error?.message || 'Could not add property rating';
+        Swal.fire('Error', message, 'error');
+        return throwError(() => err);
+      }
+      )
+    );
   }
 }
