@@ -9,6 +9,7 @@ import { AuthService } from '../../services/auth.service';
 import { debounce, debounceTime, map, Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 import { form } from '@angular/forms/signals';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'properties-page',
@@ -22,6 +23,8 @@ export class PropertiesPage {
   private provincesService = inject(ProvincesService);
   private authService = inject(AuthService);
   private destroyRef = inject(DestroyRef);
+  private route = inject(ActivatedRoute);
+
   filename: string = "";
 
   search = signal('');
@@ -30,13 +33,14 @@ export class PropertiesPage {
   provinceId = signal(0);
   provinces = signal<Province[]>([]);
   page = signal(1);
+  sellerId = signal<number | null>(null);
 
   searchField = form(this.search, schema => {
     return debounceTime(600);
   });
 
   propertiesResource = this.propertiesService.getPropertiesResource(this.search, this.provinceId,
-    this.page);
+    this.page, this.sellerId);
 
   properties = linkedSignal<PropertiesResponse | undefined, Property[]>({
     source: () => this.propertiesResource.value(),
@@ -71,6 +75,13 @@ export class PropertiesPage {
       this.propertiesResource.reload();
       this.authService.getMe();
     });
+
+    effect(() => {
+      this.route.queryParams.subscribe(params => {
+        this.sellerId.set(params['seller'] ? +params['seller'] : null);
+      });
+    });
+
   }
 
   onProvinceChange(event: Event) {
@@ -84,22 +95,6 @@ export class PropertiesPage {
     const input = event.target as HTMLInputElement;
     this.search.set(input.value);
   }
-
-  // filteredProperties = computed(() => {
-  //   const text = (this.search() ?? '').toLowerCase().trim();
-  //   const selectedProvinceId = this.provinceId();
-
-  //   return this.properties().filter((p: Property) => {
-  //     const propTitle = (p.title ?? '').toLowerCase();
-  //     const propAddress = (p.address ?? '').toLowerCase();
-  //     const propProvinceId = p.town?.province?.id ?? 0;
-
-  //     const matchSearch = propTitle.includes(text) || propAddress.includes(text);
-  //     const matchProvince = selectedProvinceId === 0 || propProvinceId === selectedProvinceId;
-
-  //     return matchSearch && matchProvince;
-  //   });
-  // });
 
   loadMore() {
     this.page.update(p => p + 1);

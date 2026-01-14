@@ -27,19 +27,21 @@ export class PropertiesService {
   getPropertiesResource(
     search: Signal<string>,
     provinceId: Signal<number>,
-    page: Signal<number>
+    page: Signal<number>,
+    sellerId: Signal<number | null>
   ) {
     return httpResource<PropertiesResponse>(() => {
+      const sellerValue = sellerId();
       const params = new URLSearchParams();
       if (search()) params.set('search', search());
       if (provinceId() !== 0) params.set('provinceId', provinceId().toString());
+      if ( sellerValue!= null) params.set('seller', sellerValue.toString());
       params.set('page', page().toString());
       const url = `/properties?${params.toString()}`;
       console.log('Resource URL:', url);
       return url;
     });
   }
-
 
   addProperty(property: PropertyInsert): Observable<SinglePropertyResponse> {
     return this.#http
