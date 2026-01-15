@@ -32,7 +32,8 @@ export interface PropertyInsert {
   mainPhoto: string;
   provinceId: number;
   town?: Town | null;
-  mine?: boolean
+  mine?: boolean;
+  status?: string;
 }
 
 export interface PropertyFormModel {

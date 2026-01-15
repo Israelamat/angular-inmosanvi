@@ -11,10 +11,12 @@ import { CommonModule } from '@angular/common';
 import { finalize, max } from 'rxjs';
 import { LoadButton } from '../../load-button/load-button';
 import Swal from 'sweetalert2';
+import { OlMap } from '../../ol-maps/ol-map';
+import { OlMarker } from '../../ol-maps/ol-marker';
 
 @Component({
   selector: 'app-property-form',
-  imports: [FormsModule, EncodeBase64Directive, Field, CommonModule, LoadButton],
+  imports: [FormsModule, EncodeBase64Directive, Field, CommonModule, LoadButton, OlMap, OlMarker],
   templateUrl: './property-form.html',
   styleUrls: ['./property-form.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,14 +28,17 @@ export class PropertyForm {
   private provincesService = inject(ProvincesService);
   private propertiesService = inject(PropertiesService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
 
   provinces = signal<Province[]>([]);
   towns = signal<Town[]>([]);
   provinceIdField = signal<string>('0');
   townIdField = signal<string>('0');
   isSubmitting = signal(false);
+  coordinates = signal<[number, number]>([-0.5, 38.5]);
 
-  private route = inject(ActivatedRoute);
+
   propertyId = signal<number | undefined>(undefined);
   isEditMode = computed(() => this.propertyId() !== undefined);
   propertyResource!: ReturnType<PropertiesService['getPropertyResource']>;
@@ -121,8 +126,10 @@ export class PropertyForm {
     this.propertyResource = this.propertiesService.getPropertyResource(this.propertyId);
 
     effect(() => {
-      const prop = this.propertyResource.value()?.property;
-      if (!prop) return;
+      const resp = this.propertyResource.value();
+      if (!resp || !resp.property) return;
+
+      const prop = resp.property;
 
       this.newProperty.set({
         title: prop.title,
@@ -139,16 +146,32 @@ export class PropertyForm {
       this.imagePreview.set(prop.mainPhoto);
     });
 
+    effect(() => {
+      const townId = +this.propertyForm.townId().value();
+      if (!townId) return;
+
+      const selectedTown = this.towns().find(t => t.id === townId);
+      if (!selectedTown) return;
+
+      const lon = typeof selectedTown.longitude === 'string' ? parseFloat(selectedTown.longitude) : selectedTown.longitude;
+      const lat = typeof selectedTown.latitude === 'string' ? parseFloat(selectedTown.latitude) : selectedTown.latitude;
+
+      if (!Number.isNaN(lon) && !Number.isNaN(lat)) {
+        this.coordinates.set([lon, lat]);
+      }
+    });
+
 
     effect(() => { this.pristine.set(false); });
   }
+
   submitProperty(event: Event) {
     event.preventDefault();
     if (!this.isFormValid()) return;
 
     this.isSubmitting.set(true);
 
-    const raw = this.propertyForm().value(); 
+    const raw = this.propertyForm().value();
     const payload: PropertyInsert = {
       title: raw.title,
       description: raw.description,
@@ -159,7 +182,8 @@ export class PropertyForm {
       numBaths: raw.numBaths,
       townId: +raw.townId,
       mainPhoto: raw.mainPhoto,
-      provinceId: +raw.provinceId
+      provinceId: +raw.provinceId,
+      status: 'selling'
     };
 
     const request = this.isEditMode()
@@ -171,16 +195,16 @@ export class PropertyForm {
     ).subscribe({
       next: (res) => {
         this.propertyCreated.set(true);
-        Swal.fire('Success', `Property ${this.isEditMode() ? 'updated' : 'created'} successfully`, 'success');
-
+        Swal.fire(
+          'Success', `Property ${this.isEditMode() ? 'updated' : 'created'} successfully`, 'success'
+        );
         if (this.isEditMode()) {
-          this.propertiesService.propertiesResource.reload();
+          this.router.navigate(['/properties']);
         } else {
-          this.propertiesService.propertiesResource.reload();
+          this.router.navigate(['/properties', res.property.id]);
         }
-
-        this.router.navigate(['/properties', res.property.id]);
       },
+
       error: (err) => {
         console.error('Error saving property', err);
         if (err?.status === 403) {

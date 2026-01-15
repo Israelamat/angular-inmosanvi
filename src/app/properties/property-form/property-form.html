@@ -5,13 +5,16 @@
 
       <!-- Select de Provincias -->
       <div>
-        <label for="province" class="block text-gray-700 font-bold mb-2">Province</label>
-        <select id="province" [field]="propertyForm.provinceId"
-          class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+        <label for="province" class="block text-gray-700 font-bold mb-2">
+          Province
+        </label>
+
+        <select id="province" [field]="propertyForm.provinceId" class="w-full px-3 py-2 border border-gray-200 rounded-lg
+             focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
           <option [value]="0">Select a province</option>
           @for (p of provinces(); track p.id) {
-          <option [value]="p.id.toString()">{{p.name}}</option>
-          }º
+          <option [value]="p.id.toString()">{{ p.name }}</option>
+          }
         </select>
 
         @for (error of propertyForm.provinceId().errors(); track error.kind) {
@@ -23,10 +26,13 @@
 
       <!-- Select de Pueblos -->
       <div>
-        <label for="town" class="block text-gray-700 font-bold mb-2">Town</label>
+        <label for="town" class="block text-gray-700 font-bold mb-2">
+          Town
+        </label>
 
-        <select id="town" class="w-full px-3 py-2 border rounded-lg" [field]="propertyForm.townId">
-          <option value="0">Select a town</option>
+        <select id="town" [field]="propertyForm.townId" class="w-full px-3 py-2 border border-gray-200 rounded-lg
+             focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <option [value]="0">Select a town</option>
           @for (t of towns(); track t.id) {
           <option [value]="t.id.toString()">{{ t.name }}</option>
           }
@@ -38,7 +44,6 @@
         </div>
         }
       </div>
-
 
     </div>
 
@@ -140,7 +145,9 @@
           {{ error.message }}
         </div>
         }
-
+        <div appOlMap [coordinates]="coordinates()">
+          <div appOlMarker [coordinates]="coordinates()"></div>
+        </div>
       </div>
 
       <!-- mainPhoto -->
@@ -155,8 +162,6 @@
           {{ error.message }}
         </div>
         }
-
-        <!-- Contenedor para la previsualización de la imagen -->
         @if (imagePreview()) {
         <div class="mt-4">
           <img [src]="imagePreview()" alt="Image preview" class="w-full h-48 object-cover rounded-lg">
@@ -170,7 +175,6 @@
         type="submit">
         {{ isEditMode() ? 'Actualizar propiedad' : 'Añadir propiedad' }}
       </app-load-button>
-
     </div>
   </form>
 </section>
