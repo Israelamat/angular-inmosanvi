@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { form, pattern, required } from '@angular/forms/signals';
 import { LoginData } from '../../interfaces/auth';
@@ -10,7 +10,7 @@ import { GoogleLogin } from '../../google-login/google-login';
 
 @Component({
   selector: 'app-login-page',
-  imports: [FormsModule, LoadButton, GoogleLogin],
+  imports: [FormsModule, LoadButton, GoogleLogin, RouterLink],
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

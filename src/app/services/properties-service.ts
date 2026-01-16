@@ -39,7 +39,7 @@ export class PropertiesService {
       params.set('page', page().toString());
 
       const url = `/properties?${params.toString()}`;
-      console.log('Resource URL:', url);
+      //console.log('Resource URL:', url);
       return url;
     });
   }

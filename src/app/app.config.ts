@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { PreloadAllModules, provideRouter, withComponentInputBinding, withPreloading } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -25,6 +25,7 @@ export const NG_STATUS_CLASSES: SignalFormsConfig['classes'] = {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideSweetAlert2({ fireOnInit: false, dismissOnDestroy: true, }),
+    provideZonelessChangeDetection(),
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules)),
     provideHttpClient(withFetch(), withInterceptors([baseUrlInterceptor, authInterceptor])),

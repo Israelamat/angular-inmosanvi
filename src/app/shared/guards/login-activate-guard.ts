@@ -8,13 +8,12 @@ export const loginActivateGuard: CanMatchFn = () => {
   const router = inject(Router);
 
   return authService.isLogged().pipe(
-    take(1), // solo toma el primer valor
+    take(1), 
     map(isLogged => {
       console.log('GUARD isLogged', isLogged);
 
       if (isLogged) return true;
 
-      // si no está logueado, redirige
       return router.createUrlTree(['/auth/login']);
     })
   );

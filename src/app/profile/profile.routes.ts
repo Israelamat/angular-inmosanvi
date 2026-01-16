@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { log } from 'console';
+import { loginActivateGuard } from '../shared/guards/login-activate-guard';
 
 export const profileRoutes: Routes = [
   {
@@ -6,6 +8,7 @@ export const profileRoutes: Routes = [
     loadComponent: () =>
       import('./profile-page/profile-page').then(m => m.ProfilePage),
     title: 'Profile',
+    canMatch: [loginActivateGuard],
   },
   {
     path: ':id', 

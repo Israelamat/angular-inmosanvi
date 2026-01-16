@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, PLATFORM_ID, Signal, signal, WritableSignal } from '@angular/core';
-import { LoginData, MyUser, MyUserResponse, RegisterData, RegisterStringReponse, TokenResponse, UserResponse } from '../interfaces/auth';
-import { HttpClient, httpResource } from '@angular/common/http';
+import { LoginData, MyUser, MyUserResponse, RegisterData, RegisterStringReponse, TokenResponse } from '../interfaces/auth';
+import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, of, tap, finalize } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
@@ -77,8 +77,8 @@ export class AuthService {
       this.#router.navigate(['/auth/login']);
     }
 
-    const googleAccounts = (window as any).google?.accounts?.id;
-    if (googleAccounts) googleAccounts.disableAutoSelect();
+    // const googleAccounts = (window as any).google?.accounts?.id;
+    // if (googleAccounts) googleAccounts.disableAutoSelect();
   }
 
   isLogged(): Observable<boolean> {
@@ -94,8 +94,7 @@ export class AuthService {
       tap(() => this.#logged.set(true)),
       map(() => true),
       catchError(() => {
-        this.#logged.set(false);
-        localStorage.removeItem('token');
+        this.logout();
         return of(false);
       }),
       finalize(() => { this.#validateInFlight = null; })

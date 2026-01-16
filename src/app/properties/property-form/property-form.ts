@@ -62,7 +62,7 @@ export class PropertyForm {
 
   propertyForm = form(this.newProperty, (schema) => {
     required(schema.title, { message: 'Title is required' });
-    minLength(schema.title, 5, { message: 'Title must be at least 5 characters' });
+    minLength(schema.title, 4, { message: 'Title must be at least 4 characters' });
     pattern(schema.title, /^[a-zA-Z][a-zA-Z ]*$/, { message: 'Title must start with a letter and contain only letters and spaces' });
     required(schema.description, { message: 'Description is required' });
     required(schema.address, { message: 'Address is required' });

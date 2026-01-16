@@ -4,7 +4,7 @@
     <h2 class="text-2xl font-bold text-gray-800 mb-6">Properties for Sale</h2>
     <div class="text-gray-600 text-sm p-2 mb-4">
       Showing {{ properties().length }} properties
-      filtered by "{{ search() }}" in province "{{ province() || 'All' }}".
+      filtered by "{{ search() }}" in province "{{ provinceName() || 'All' }}".
     </div>
     <section id="search-and-filter" class="mb-6 bg-white p-6 rounded-lg shadow-md">
       <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
