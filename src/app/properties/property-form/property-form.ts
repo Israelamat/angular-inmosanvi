@@ -30,20 +30,20 @@ export class PropertyForm {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-
   provinces = signal<Province[]>([]);
   towns = signal<Town[]>([]);
   provinceIdField = signal<string>('0');
   townIdField = signal<string>('0');
   isSubmitting = signal(false);
   coordinates = signal<[number, number]>([-0.5, 38.5]);
-
-
   propertyId = signal<number | undefined>(undefined);
   isEditMode = computed(() => this.propertyId() !== undefined);
-  propertyResource!: ReturnType<PropertiesService['getPropertyResource']>;
 
-
+  constructor() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) this.propertyId.set(+id);
+  }
+  
   newProperty = signal<PropertyFormModel>({
     title: '',
     description: '',
@@ -99,71 +99,54 @@ export class PropertyForm {
 
   });
 
-  constructor() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) this.propertyId.set(+id);
-    effect(() => {
-      const resp = this.provincesService.provincesResource.value();
-      if (resp) this.provinces.set(resp.provinces);
+
+  propertyResource = this.propertiesService.getPropertyResource(this.propertyId);
+
+  provincesEffect = effect(() => {
+    const resp = this.provincesService.provincesResource.value();
+    if (resp) this.provinces.set(resp.provinces);
+  });
+
+  private provinceIdSignal = computed(() => +this.propertyForm.provinceId().value());
+  townsResource = this.provincesService.getTownsResource(this.provinceIdSignal);
+
+  townsEffect = effect(() => {
+    this.provinceIdSignal(); //dependency
+    untracked(() => this.propertyForm.townId().value.set('0'));
+    const resp = this.townsResource.value();
+    this.towns.set(resp?.towns ?? []);
+  });
+
+  propertyResourceEffect = effect(() => {
+    const resp = this.propertyResource.value();
+    if (!resp?.property) return;
+    const p = resp.property;
+    this.newProperty.set({
+      title: p.title,
+      description: p.description,
+      price: p.price,
+      address: p.address,
+      sqmeters: p.sqmeters,
+      numRooms: p.numRooms,
+      numBaths: p.numBaths,
+      townId: '' + p.town?.id,
+      provinceId: '' + p.provinceId,
+      mainPhoto: p.mainPhoto,
     });
+    this.imagePreview.set(p.mainPhoto ?? '');
+  });
 
-    const provinceIdSignal = computed(() => {
-      const value = this.propertyForm.provinceId().value();
-      return +value;
-    });
-    const townsResource = this.provincesService.getTownsResource(provinceIdSignal);
+  coordinatesEffect = effect(() => {
+    const townId = +this.propertyForm.townId().value();
+    if (!townId) return;
+    const selected = this.towns().find(t => t.id === townId);
+    if (!selected) return;
+    const lon = Number(selected.longitude);
+    const lat = Number(selected.latitude);
+    if (!Number.isNaN(lon) && !Number.isNaN(lat)) this.coordinates.set([lon, lat]);
+  });
 
-    effect(() => {
-      provinceIdSignal();
-      untracked(() => {
-        this.propertyForm.townId().value.set('0');
-      });
-
-      const resp = townsResource.value();
-      this.towns.set(resp ? resp.towns : []);
-    });
-
-    this.propertyResource = this.propertiesService.getPropertyResource(this.propertyId);
-
-    effect(() => {
-      const resp = this.propertyResource.value();
-      if (!resp || !resp.property) return;
-
-      const prop = resp.property;
-
-      this.newProperty.set({
-        title: prop.title,
-        description: prop.description,
-        price: prop.price,
-        address: prop.address,
-        sqmeters: prop.sqmeters,
-        numRooms: prop.numRooms,
-        numBaths: prop.numBaths,
-        townId: '' + prop.town?.id,
-        provinceId: '' + prop.provinceId,
-        mainPhoto: prop.mainPhoto,
-      });
-      this.imagePreview.set(prop.mainPhoto);
-    });
-
-    effect(() => {
-      const townId = +this.propertyForm.townId().value();
-      if (!townId) return;
-
-      const selectedTown = this.towns().find(t => t.id === townId);
-      if (!selectedTown) return;
-
-      const lon = typeof selectedTown.longitude === 'string' ? parseFloat(selectedTown.longitude) : selectedTown.longitude;
-      const lat = typeof selectedTown.latitude === 'string' ? parseFloat(selectedTown.latitude) : selectedTown.latitude;
-
-      if (!Number.isNaN(lon) && !Number.isNaN(lat)) {
-        this.coordinates.set([lon, lat]);
-      }
-    });
-
-
-    effect(() => { this.pristine.set(false); });
-  }
+  pristineEffect = effect(() => { this.pristine.set(false); });
 
   submitProperty(event: Event) {
     event.preventDefault();

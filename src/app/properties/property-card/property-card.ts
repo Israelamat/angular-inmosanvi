@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, Input, output, Signal, signal } from '@angular/core';
 import { Property } from '../../interfaces/propoerty';
 import { IntlCurrencyPipe } from "../../pipes/intl-currency-pipe";
 import { RouterLink } from '@angular/router';
@@ -14,11 +14,13 @@ import { RouterLink } from '@angular/router';
   }
 })
 export class PropertyCard {
-  @Input({ required: true }) property!: Property;
-  @Input() canDelete = signal(false);
-  @Output() deleted = new EventEmitter<number>();
+  property = input.required<Property>();
+  canDelete = input(false); 
+  canEdit = input(false); 
+  deleted = output<number>();
+
 
   deleteProperty() {
-    this.deleted.emit(this.property.id);
+    this.deleted.emit(this.property().id);
   }
 }

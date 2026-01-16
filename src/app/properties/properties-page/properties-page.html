@@ -32,7 +32,7 @@
 
       @for (property of properties(); track property.id) {
       <app-property-card [property]="property" (deleted)="deleteProperty($event)"
-        [canDelete]="canDelete(property)"></app-property-card>
+        [canDelete]="canDelete(property)" [canEdit]="canEdit(property)"></app-property-card>
 
       } @empty {
       <p class="text-2xl text-gray-500">No properties found.</p>

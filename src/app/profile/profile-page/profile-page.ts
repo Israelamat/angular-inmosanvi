@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, PLATFORM_ID, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, PLATFORM_ID, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { User, UserResponse } from '../../interfaces/auth';
@@ -11,6 +11,8 @@ import { HttpResourceRef } from '@angular/common/http';
   imports: [RouterModule],
   templateUrl: './profile-page.html',
   styleUrl: './profile-page.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 export class ProfilePage {
   private route = inject(ActivatedRoute);
@@ -41,11 +43,11 @@ export class ProfilePage {
 
     if (idParam) {
       this.profileService.getById(+idParam).subscribe(res => {
-        this.profileUser.set(res.user); 
+        this.profileUser.set(res.user);
       });
     } else {
       this.authService.getMe().subscribe(res => {
-        this.profileUser.set(res);    
+        this.profileUser.set(res);
       });
     }
 

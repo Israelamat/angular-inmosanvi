@@ -1,19 +1,21 @@
 import { User } from "./auth";
 
-export interface Property extends Omit<PropertyInsert, 'townId'> {
+export interface Property extends Omit<PropertyInsert, 'townId' | 'mine' | 'town' | 'status'> {
   id: number;
   createdAt: string;
-  status: string;
   town: Town | null;
+  mine: boolean;
+  seller: number
 }
 
-export interface Province{
+
+export interface Province {
   id: number,
   name: string
 }
 
-export interface Town{
-  id:number,
+export interface Town {
+  id: number,
   name: string,
   longitude: string,
   latitude: string,
@@ -31,9 +33,7 @@ export interface PropertyInsert {
   townId: number;
   mainPhoto: string;
   provinceId: number;
-  town?: Town | null;
-  mine?: boolean;
-  status?: string;
+  status: string;
 }
 
 export interface PropertyFormModel {
@@ -44,29 +44,29 @@ export interface PropertyFormModel {
   sqmeters: number;
   numRooms: number;
   numBaths: number;
-  townId: string;     
+  townId: string;
   mainPhoto: string;
-  provinceId: string; 
-} 
-
-export interface ProvincesResponse{
-  provinces:Province[]
+  provinceId: string;
 }
 
-export interface TownsResponse{
+export interface ProvincesResponse {
+  provinces: Province[]
+}
+
+export interface TownsResponse {
   towns: Town[]
 }
 
-export interface PropertiesResponse{
+export interface PropertiesResponse {
   properties: Property[]
 }
 
-export interface SinglePropertyResponse{
-  property:Property
+export interface SinglePropertyResponse {
+  property: Property
 }
 
-export interface SinglePropertyResponseInsert{
-  property:PropertyInsert
+export interface SinglePropertyResponseInsert {
+  property: PropertyInsert
 }
 
 export interface Rating {

@@ -120,12 +120,32 @@ export class PropertiesPage {
       if (result.isConfirmed) {
         this.propertiesService.deleteProperty(id)
           .pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe();
+          .subscribe({
+            next: () => {
+              Swal.fire('Deleted!', 'Property has been deleted.', 'success');
+              this.propertiesResource.reload();
+            },
+            error: (err) => {
+              if (err.status === 404) {
+                Swal.fire('Error', 'Property not found, it may have already been deleted.', 'error');
+                this.propertiesResource.reload();
+              } else {
+                Swal.fire('Error', 'An unexpected error occurred.', 'error');
+              }
+            }
+          });
       }
     });
   }
 
-  canDelete(property?: Property): WritableSignal<boolean> {
-    return signal(property?.mine ?? false);
+  canDelete(property?: Property): boolean {
+    return property?.mine ?? false;
   }
+
+  canEdit(property: Property): boolean {
+    const logged = this.authService.logged();
+    const me = this.authService.userId();
+    return logged && me === property.seller;
+  }
+
 }
