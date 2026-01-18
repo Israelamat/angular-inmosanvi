@@ -1,6 +1,7 @@
 import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, Signal } from '@angular/core';
 import { MyUserResponse, User, UserResponse } from '../interfaces/auth';
+import { UpdatePassword, UpdateProfileInfo } from '../interfaces/profile';
 
 @Injectable({
   providedIn: 'root',
@@ -23,5 +24,19 @@ export class ProfileService {
 
       return { url: `/users/${userId}`, method: 'GET' };
     });
+  }
+
+  updateInfo(data: UpdateProfileInfo) {
+    return this.#http.put<UserResponse>('/users/me', data);
+  }
+
+  updatePhoto(photo: File) {
+    const formData = new FormData();
+    formData.append('photo', photo);
+    return this.#http.put<UserResponse>('/users/me/photo', formData);
+  }
+
+  updatePassword(data: UpdatePassword) {
+    return this.#http.put<{ message: string }>('/users/me/password', data);
   }
 }

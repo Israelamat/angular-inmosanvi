@@ -60,7 +60,6 @@ export class PropertiesPage {
   });
 
   constructor() {
-    this.authService.isLogged().subscribe(); //handle reload page 
     effect(() => console.log(this.search()));
   }
 
