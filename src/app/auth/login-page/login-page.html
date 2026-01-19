@@ -38,13 +38,20 @@
         </div>
         }
       </div>
+      <div class="mb-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div class="mb-6 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div
+            class="w-64 h-12 flex items-center justify-center border border-gray-300 rounded-lg overflow-hidden bg-white">
+            <div appGoogleLogin class="w-full h-full" (login)="loggedGoogle($event)"></div>
+          </div>
 
-      <!-- Submit -->
-       <div class="mb-4 flex justify-center">
-        <!-- Solo se cargará en navegador, el div necesita ancho y alto -->
-        <div appGoogleLogin
-             class="w-60 h-12"
-             (login)="loggedGoogle($event)">
+          <button fbLogin [scopes]="['email', 'public_profile']"
+            class="w-64 h-11 bg-[#1877F2] hover:bg-[#166fe5] text-white flex items-center justify-center gap-3 rounded-lg font-medium transition-all shadow-sm"
+            (loginOk)="loggedFacebook($event)" (loginError)="showError($event)">
+
+            <fa-icon [icon]="iconFacebook" class="text-xl"></fa-icon>
+            <span class="text-sm">Login con Facebook</span>
+          </button>
         </div>
       </div>
       <app-load-button class="w-full" [loading]="isSubmitting()"
@@ -52,8 +59,6 @@
         type="submit">
         Login
       </app-load-button>
-
-
       <!-- Register -->
       <div class="mt-6 text-center">
         <p class="text-sm text-gray-600">

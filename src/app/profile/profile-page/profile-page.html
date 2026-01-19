@@ -11,16 +11,14 @@
     </h2>
 
     <div class="bg-white p-8 rounded-lg shadow-md">
-
       <!-- PROFILE VIEW -->
       @if (!showEditProfile() && !showChangePassword()) {
       <div>
         <div class="text-center">
-
           <!-- Avatar -->
           <input type="file" id="avatar-upload" class="hidden" />
           <label for="avatar-upload" class="cursor-pointer group relative inline-block">
-            <img [src]="user.avatar || 'assets/default-avatar.png'" alt="Avatar del usuario"
+            <img [src]="user.avatar || '/angular-inmosanvi/public/img/user-default.webp'" alt="Avatar del usuario"
               class="w-32 h-32 object-cover rounded-full mx-auto mb-4 border-4 border-gray-200 transition-colors" />
             <div class="absolute inset-0 bg-black bg-opacity-50 rounded-full h-32
                          flex items-center justify-center opacity-0

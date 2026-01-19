@@ -7,10 +7,14 @@ import { LoginData } from '../../interfaces/auth';
 import { LoadButton } from '../../load-button/load-button';
 import Swal from 'sweetalert2';
 import { GoogleLogin } from '../../google-login/google-login';
+import { FbLogin } from '../../facebook-login/fb-login';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faFacebook } from '@fortawesome/free-brands-svg-icons';
+
 
 @Component({
   selector: 'app-login-page',
-  imports: [FormsModule, LoadButton, GoogleLogin, RouterLink],
+  imports: [FormsModule, LoadButton, GoogleLogin, RouterLink, FbLogin, FontAwesomeModule],
   templateUrl: './login-page.html',
   styleUrl: './login-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,6 +28,8 @@ export class LoginPage {
 
   isSubmitting = signal(false);
   pristine = signal(true);
+  iconFacebook = faFacebook;
+
 
   userLogin = signal<LoginData>({
     email: '',
@@ -80,5 +86,14 @@ export class LoginPage {
       next: () => this.router.navigate(['/properties']),
       error: (err) => console.error('Google login error', err)
     });
+  }
+
+  loggedFacebook(resp: fb.StatusResponse) {
+    // Envía esto a tu API
+    console.log(resp.authResponse.accessToken);
+  }
+
+  showError(error: any) {
+    console.error(error);
   }
 }
