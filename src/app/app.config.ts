@@ -10,6 +10,7 @@ import { provideSweetAlert2 } from '@sweetalert2/ngx-sweetalert2';
 import { provideGoogleId } from './google-login/google-login.config';
 import { authInterceptor } from './shared/interceptors/auth-interceptor';
 import { provideFacebookId } from './facebook-login/facebook-login.config';
+import { provideServerRendering } from '@angular/ssr';
 
 export const NG_STATUS_CLASSES: SignalFormsConfig['classes'] = {
   'is-valid': field => field.state().valid(),   // <-- Llamamos al signal
@@ -31,10 +32,10 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding(), withPreloading(PreloadAllModules)),
     provideHttpClient(withFetch(), withInterceptors([baseUrlInterceptor, authInterceptor])),
     provideClientHydration(withEventReplay()),
+    provideServerRendering(),
     provideSignalFormsConfig({
       classes: NG_STATUS_CLASSES,
     }),
-    provideClientHydration(withEventReplay()),
     provideGoogleId('346010978808-3729g5sdok53b39ai2do3g366smlia2u.apps.googleusercontent.com'),
     provideFacebookId('2722524358123209', 'v15.0')
   ]
