@@ -79,18 +79,40 @@ export class LoginPage {
 
   loggedGoogle(resp: unknown) {
     const credential = (resp as google.accounts.id.CredentialResponse).credential;
-    console.log('Google Credential:', credential);
-
-    // Aquí puedes enviar la credencial a tu backend para autenticar o registrar
+    console.log('Google Credential:', credential); // Debe ser un JWT de Google
     this.authService.loginWithGoogle({ token: credential }).subscribe({
       next: () => this.router.navigate(['/properties']),
       error: (err) => console.error('Google login error', err)
     });
   }
 
+
   loggedFacebook(resp: fb.StatusResponse) {
-    // Envía esto a tu API
-    console.log(resp.authResponse.accessToken);
+    const token = resp.authResponse?.accessToken;
+    if (!token) return;
+
+    this.isSubmitting.set(true);
+
+    this.authService.loginWithFacebook({ token }).subscribe({
+      next: () => this.handlePostLogin(),
+      error: (err) => {
+        console.error('Facebook login error', err);
+        this.isSubmitting.set(false);
+        Swal.fire('Error', 'Facebook login failed', 'error');
+      }
+    });
+  }
+
+  private handlePostLogin() {
+    this.authService.getMe().subscribe(user => {
+      this.isSubmitting.set(false);
+      if (user) {
+        Swal.fire('Success', 'Logged in successfully', 'success');
+        this.router.navigate(['/properties']);
+      } else {
+        Swal.fire('Error', 'Could not fetch user data', 'error');
+      }
+    });
   }
 
   showError(error: any) {

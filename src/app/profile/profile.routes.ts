@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { log } from 'console';
 import { loginActivateGuard } from '../shared/guards/login-activate-guard';
 
 export const profileRoutes: Routes = [
