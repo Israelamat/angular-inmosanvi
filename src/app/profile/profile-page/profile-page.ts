@@ -4,7 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { User, UserResponse } from '../../interfaces/auth';
 import { ProfileService } from '../../services/profile.service';
 import { email, Field, form, required, validate } from '@angular/forms/signals';
-import { UpdatePassword } from '../../interfaces/profile';
+import { UpdateAvatar, UpdatePassword } from '../../interfaces/profile';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -22,13 +22,14 @@ export class ProfilePage {
   showEditProfile = signal(false);
   showChangePassword = signal(false);
   showChangePhoto = signal(false);
+  avatarBase64 = signal<string>('');
 
   user = this.authService.user;
   // userResource es un HttpResourceRef (devuelto por httpResource)
   userResource = this.profileService.getProfileResource(this.user);
 
   isMyProfile = computed(() => {
-    const user = this.userResource.value()?.user;   
+    const user = this.userResource.value()?.user;
     return user?.id === this.authService.userId();
   });
 
@@ -67,7 +68,7 @@ export class ProfilePage {
 
   constructor() {
     effect(() => {
-      const response = this.userResource.value();      
+      const response = this.userResource.value();
       if (!response?.user) return;
 
       this.profileModel.set({
@@ -101,7 +102,7 @@ export class ProfilePage {
     this.profileService
       .updateInfo(this.profileModel())
       .subscribe(() => {
-        this.userResource.reload(); 
+        this.userResource.reload();
         this.cancelForms();
         Swal.fire('Success', 'Profile updated successfully', 'success');
       });
@@ -121,5 +122,43 @@ export class ProfilePage {
         this.cancelForms();
         Swal.fire('Success', 'Password updated successfully', 'success');
       });
+  }
+
+  changeAvatar(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      const base64String = reader.result as string;
+      const payload: UpdateAvatar = {
+        avatar: base64String
+      };
+      this.profileService.updatePhoto(payload).subscribe({
+        next: () => {
+          this.userResource.update(current => {
+            if (!current || !current.user) return current;
+
+            return {
+              ...current,
+              user: {
+                ...current.user,
+                avatar: base64String
+              }
+            };
+          });
+          this.cancelForms();
+          Swal.fire('¡Éxito!', 'Photo updated successfully', 'success');
+        },
+        error: (err) => {
+          console.error('Error del servidor:', err);
+          Swal.fire('Error', 'An unexpected error occurred', 'error');
+        }
+      });
+    };
   }
 }

@@ -1,7 +1,7 @@
 import { HttpClient, httpResource } from '@angular/common/http';
 import { inject, Injectable, Signal } from '@angular/core';
 import { MyUserResponse, User, UserResponse } from '../interfaces/auth';
-import { UpdatePassword, UpdateProfileInfo } from '../interfaces/profile';
+import { UpdateAvatar, UpdatePassword, UpdateProfileInfo } from '../interfaces/profile';
 
 @Injectable({
   providedIn: 'root',
@@ -30,10 +30,8 @@ export class ProfileService {
     return this.#http.put<UserResponse>('/users/me', data);
   }
 
-  updatePhoto(photo: File) {
-    const formData = new FormData();
-    formData.append('photo', photo);
-    return this.#http.put<UserResponse>('/users/me/photo', formData);
+  updatePhoto(avatar: UpdateAvatar) {
+    return this.#http.put<UserResponse>('/users/me/avatar', avatar);
   }
 
   updatePassword(data: UpdatePassword) {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PropertyInsert, Province, Town, PropertyFormModel, SinglePropertyResponse } from '../../interfaces/propoerty';
 import { FormsModule } from '@angular/forms';
@@ -6,7 +6,7 @@ import { httpResource } from '@angular/common/http';
 import { EncodeBase64Directive } from '../../directives/encode-base64';
 import { ProvincesService } from '../../services/provinces-service';
 import { PropertiesService } from '../../services/properties-service';
-import { form, required, min, minLength, pattern, Field } from '@angular/forms/signals';
+import { form, required, min, minLength, pattern, Field, validate } from '@angular/forms/signals';
 import { CommonModule } from '@angular/common';
 import { finalize, max } from 'rxjs';
 import { LoadButton } from '../../load-button/load-button';
@@ -36,14 +36,17 @@ export class PropertyForm {
   townIdField = signal<string>('0');
   isSubmitting = signal(false);
   coordinates = signal<[number, number]>([-0.5, 38.5]);
-  propertyId = signal<number | undefined>(undefined);
-  isEditMode = computed(() => this.propertyId() !== undefined);
+  isEditMode = computed(() => this.id() !== 0);
+  id = input.required({
+    alias: 'id', // El nombre del parámetro en la ruta
+    transform: (v: string | undefined) => Number(v ?? 0)
+  });
 
-  constructor() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) this.propertyId.set(+id);
-  }
-  
+  // constructor() {
+  //   const id = this.route.snapshot.paramMap.get('id');
+  //   if (id) this.propertyId.set(+id);
+  // }
+
   newProperty = signal<PropertyFormModel>({
     title: '',
     description: '',
@@ -64,19 +67,27 @@ export class PropertyForm {
     required(schema.title, { message: 'Title is required' });
     minLength(schema.title, 4, { message: 'Title must be at least 4 characters' });
     pattern(schema.title, /^[a-zA-Z][a-zA-Z ]*$/, { message: 'Title must start with a letter and contain only letters and spaces' });
+
     required(schema.description, { message: 'Description is required' });
     required(schema.address, { message: 'Address is required' });
     min(schema.price, 1, { message: 'Price must be at least 1' });
     min(schema.sqmeters, 1, { message: 'Square meters must be at least 1' });
     min(schema.numRooms, 1, { message: 'Number of rooms must be at least 1' });
     min(schema.numBaths, 1, { message: 'Number of baths must be at least 1' });
-    required(schema.mainPhoto, { message: 'Image is required' });
+    //required(schema.mainPhoto, { message: 'Image is required' });
 
     required(schema.provinceId, { message: 'Province is required' });
     pattern(schema.provinceId, /^[1-9]\d*$/, { message: 'Select a valid province' });
 
     required(schema.townId, { message: 'Town is required' });
     pattern(schema.townId, /^[1-9]\d*$/, { message: 'Select a valid town' });
+
+    validate(schema.mainPhoto, ({ value }) => {
+      if (!this.isEditMode() && !value()) {
+        return { kind: 'required', message: 'Image is required' };
+      }
+      return null;
+    });
   });
 
   isFormValid = computed(() => {
@@ -92,16 +103,13 @@ export class PropertyForm {
       this.propertyForm.provinceId(),
       this.propertyForm.townId(),
     ];
-    fields.forEach(f => {
-      //console.log(f.errors());
-    });
     return fields.every(f => !(f.errors()?.length));
 
   });
 
-
-  propertyResource = this.propertiesService.getPropertyResource(this.propertyId);
-
+  propertyResource = this.propertiesService.getPropertyResource(
+    computed(() => this.id() === 0 ? undefined : this.id())
+  );
   provincesEffect = effect(() => {
     const resp = this.provincesService.provincesResource.value();
     if (resp) this.provinces.set(resp.provinces);
@@ -111,10 +119,21 @@ export class PropertyForm {
   townsResource = this.provincesService.getTownsResource(this.provinceIdSignal);
 
   townsEffect = effect(() => {
-    this.provinceIdSignal(); //dependency
-    untracked(() => this.propertyForm.townId().value.set('0'));
     const resp = this.townsResource.value();
-    this.towns.set(resp?.towns ?? []);
+    const list = resp?.towns ?? [];
+    this.towns.set(list);
+
+    if (list.length > 0) {
+      untracked(() => {
+        const currentTownId = this.propertyForm.townId().value();
+        const exists = list.some(t => String(t.id) === currentTownId);
+        if (exists) {
+          this.propertyForm.townId().value.set(currentTownId);
+        } else if (!this.pristine()) {
+          this.propertyForm.townId().value.set('0');
+        }
+      });
+    }
   });
 
   propertyResourceEffect = effect(() => {
@@ -129,8 +148,8 @@ export class PropertyForm {
       sqmeters: p.sqmeters,
       numRooms: p.numRooms,
       numBaths: p.numBaths,
-      townId: '' + p.town?.id,
-      provinceId: '' + p.provinceId,
+      provinceId: String(p.town?.province?.id ?? '0'),
+      townId: String(p.town?.id ?? '0'),
       mainPhoto: p.mainPhoto,
     });
     this.imagePreview.set(p.mainPhoto ?? '');
@@ -170,7 +189,7 @@ export class PropertyForm {
     };
 
     const request = this.isEditMode()
-      ? this.propertiesService.updateProperty(this.propertyId()!, payload)
+      ? this.propertiesService.updateProperty(this.id()!, payload)
       : this.propertiesService.addProperty(payload);
 
     request.pipe(

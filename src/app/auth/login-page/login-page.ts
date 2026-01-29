@@ -114,8 +114,4 @@ export class LoginPage {
       }
     });
   }
-
-  showError(error: any) {
-    console.error(error);
-  }
 }

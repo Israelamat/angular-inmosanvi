@@ -16,9 +16,9 @@
       <div>
         <div class="text-center">
           <!-- Avatar -->
-          <input type="file" id="avatar-upload" class="hidden" />
+          <input type="file" id="avatar-upload" class="hidden" (change)="changeAvatar($event)" />
           <label for="avatar-upload" class="cursor-pointer group relative inline-block">
-            <img [src]="user.avatar || '/angular-inmosanvi/public/img/user-default.webp'" alt="Avatar del usuario"
+            <img [src]="user.avatar || '/public/img/user-default.webp'" alt="Avatar del usuario"
               class="w-32 h-32 object-cover rounded-full mx-auto mb-4 border-4 border-gray-200 transition-colors" />
             <div class="absolute inset-0 bg-black bg-opacity-50 rounded-full h-32
                          flex items-center justify-center opacity-0

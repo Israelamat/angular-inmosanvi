@@ -77,7 +77,7 @@ export class PropertiesPage {
     this.sellerId
   );
 
-  properties = linkedSignal<PropertiesResponse | undefined, Property[]>({
+    properties = linkedSignal<PropertiesResponse | undefined, Property[]>({
     source: () => this.propertiesResource.value(),
     computation: (resp, previous) => {
       if (!resp) return previous?.value ?? [];
