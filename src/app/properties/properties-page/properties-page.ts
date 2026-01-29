@@ -7,7 +7,6 @@ import {
   inject,
   linkedSignal,
   signal,
-  WritableSignal
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PropertiesService } from '../../services/properties-service';
@@ -19,8 +18,7 @@ import { AuthService } from '../../services/auth.service';
 import { debounceTime, map } from 'rxjs';
 import Swal from 'sweetalert2';
 import { form } from '@angular/forms/signals';
-import { ActivatedRoute, Router } from '@angular/router';
-import { routes } from '../../app.routes';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'properties-page',
@@ -36,8 +34,6 @@ export class PropertiesPage {
   private authService = inject(AuthService);
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
-
 
   search = signal('');
   provinceId = signal(0);
@@ -77,7 +73,7 @@ export class PropertiesPage {
     this.sellerId
   );
 
-    properties = linkedSignal<PropertiesResponse | undefined, Property[]>({
+  properties = linkedSignal<PropertiesResponse | undefined, Property[]>({
     source: () => this.propertiesResource.value(),
     computation: (resp, previous) => {
       if (!resp) return previous?.value ?? [];

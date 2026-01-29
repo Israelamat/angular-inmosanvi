@@ -34,12 +34,12 @@ export class PropertiesService {
       const sellerValue = sellerId();
       const params = new URLSearchParams();
       if (search()) params.set('search', search());
-      if (provinceId() !== 0) params.set('towns.province.id', provinceId().toString());
+      if (provinceId() !== 0) params.set('province', provinceId().toString());
       params.set('seller', sellerValue != null ? sellerValue.toString() : '0');  //send 0 if seller is null
       params.set('page', page().toString());
 
       const url = `/properties?${params.toString()}`;
-      //console.log('Resource URL:', url);
+      console.log('Resource URL:', url);
       return url;
     });
   }
