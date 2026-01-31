@@ -34,7 +34,7 @@
 
         @for (error of loginForm.password().errors(); track error.kind) {
         <div class="text-sm text-red-700">
-          {{ error.message }}
+          {{ error.message }}s
         </div>
         }
       </div>
@@ -44,7 +44,11 @@
             class="w-64 h-12 flex items-center justify-center border border-gray-300 rounded-lg overflow-hidden bg-white">
             <div appGoogleLogin class="w-full h-full" (login)="loggedGoogle($event)"></div>
           </div>
-
+          @if (errorMessage) {
+          <div class="error-msg">
+            {{ errorMessage }}
+          </div>
+          }xº
           <button fbLogin [scopes]="['email', 'public_profile']"
             class="w-64 h-11 bg-[#1877F2] hover:bg-[#166fe5] text-white flex items-center justify-center gap-3 rounded-lg font-medium transition-all shadow-sm"
             (loginOk)="loggedFacebook($event)">

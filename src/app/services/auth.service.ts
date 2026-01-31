@@ -14,6 +14,7 @@ export class AuthService {
   #isBrowser = isPlatformBrowser(this.#platformId);
   #router = inject(Router);
   #cookieService = inject(SsrCookieService);
+  #loginMethod = signal<'google' | 'facebook' | 'local' | null>(null);
 
   #logged: WritableSignal<boolean> = signal(false);
   get logged(): Signal<boolean> { return this.#logged.asReadonly(); }
@@ -51,19 +52,28 @@ export class AuthService {
 
   login(user: LoginData): Observable<TokenResponse> {
     return this.#http.post<TokenResponse>('/auth/login', user).pipe(
-      tap(res => this.setTokenAndLogged(res.accessToken))
+      tap(res => {
+        this.setTokenAndLogged(res.accessToken);
+        this.#loginMethod.set('local');
+      })
     );
   }
 
   loginWithGoogle(data: { token: string }): Observable<TokenResponse> {
     return this.#http.post<{ accessToken: string }>('/auth/google', data).pipe(
-      tap(res => this.setTokenAndLogged(res.accessToken))
+      tap(res => {
+        this.#loginMethod.set('google');
+        this.setTokenAndLogged(res.accessToken);
+      })
     );
   }
 
   loginWithFacebook(data: { token: string }): Observable<TokenResponse> {
     return this.#http.post<{ accessToken: string }>('/auth/facebook', data).pipe(
-      tap(res => this.setTokenAndLogged(res.accessToken))
+      tap(res => {
+        this.#loginMethod.set('facebook');
+        this.setTokenAndLogged(res.accessToken);
+      })
     );
   }
 

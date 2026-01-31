@@ -29,7 +29,7 @@ export class LoginPage {
   isSubmitting = signal(false);
   pristine = signal(true);
   iconFacebook = faFacebook;
-
+  errorMessage: string | null = null;
 
   userLogin = signal<LoginData>({
     email: '',
@@ -80,9 +80,13 @@ export class LoginPage {
   loggedGoogle(resp: unknown) {
     const credential = (resp as google.accounts.id.CredentialResponse).credential;
     console.log('Google Credential:', credential); // Debe ser un JWT de Google
+    this.errorMessage = null;
     this.authService.loginWithGoogle({ token: credential }).subscribe({
       next: () => this.router.navigate(['/properties']),
-      error: (err) => console.error('Google login error', err)
+      error: (err) => {
+        console.error('Google login error', err)
+        this.errorMessage = 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.';
+      }
     });
   }
 
