@@ -16,6 +16,10 @@ export class TopMenu {
 
   isLogged = computed(() => this.authService.logged());
 
+  constructor() {
+    this.authService.isLogged().subscribe();
+  }
+
   logout = () => {
     this.authService.logout();
     this.router.navigate(['/auth/login']);

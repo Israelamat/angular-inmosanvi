@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, Input, Output, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, Input, Output, Signal, signal } from '@angular/core';
 import { Rating, RatingsResponse } from '../../interfaces/propoerty';
 import { PropertiesService } from '../../services/properties-service';
 import { StarRating } from '../../shared/star-rating/star-rating';
@@ -9,6 +9,8 @@ import Swal from 'sweetalert2';
   imports: [StarRating],
   templateUrl: './property-comments.html',
   styleUrl: './property-comments.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 export class PropertyComments {
   propertyId = input.required<number>();
@@ -37,7 +39,7 @@ export class PropertyComments {
   }
 
   addRating() {
-    if (this.newRating() <= 0 || this.newComment().trim() === ''){
+    if (this.newRating() <= 0 || this.newComment().trim() === '') {
       Swal.fire('Error', 'Please enter a rating and comment', 'error');
       return;
     }

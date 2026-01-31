@@ -1,14 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PropertyInsert, Province, Town, PropertyFormModel, SinglePropertyResponse } from '../../interfaces/propoerty';
-import { FormsModule } from '@angular/forms';
-import { httpResource } from '@angular/common/http';
+import { PropertyInsert, Province, Town, PropertyFormModel } from '../../interfaces/propoerty';
 import { EncodeBase64Directive } from '../../directives/encode-base64';
 import { ProvincesService } from '../../services/provinces-service';
 import { PropertiesService } from '../../services/properties-service';
 import { form, required, min, minLength, pattern, Field, validate } from '@angular/forms/signals';
 import { CommonModule } from '@angular/common';
-import { finalize, max } from 'rxjs';
+import { finalize } from 'rxjs';
 import { LoadButton } from '../../load-button/load-button';
 import Swal from 'sweetalert2';
 import { OlMap } from '../../ol-maps/ol-map';
@@ -16,7 +14,7 @@ import { OlMarker } from '../../ol-maps/ol-marker';
 
 @Component({
   selector: 'app-property-form',
-  imports: [FormsModule, EncodeBase64Directive, Field, CommonModule, LoadButton, OlMap, OlMarker],
+  imports: [EncodeBase64Directive, Field, CommonModule, LoadButton, OlMap, OlMarker],
   templateUrl: './property-form.html',
   styleUrls: ['./property-form.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

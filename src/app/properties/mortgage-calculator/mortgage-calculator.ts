@@ -1,10 +1,12 @@
-import { Component, Input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, signal } from '@angular/core';
 
 @Component({
   selector: 'app-mortgage-calculator',
   imports: [],
   templateUrl: './mortgage-calculator.html',
   styleUrl: './mortgage-calculator.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
 export class MortgageCalculator {
   @Input() price: number | undefined; //do not need reactivity 

@@ -59,6 +59,9 @@ export interface TownsResponse {
 
 export interface PropertiesResponse {
   properties: Property[]
+  total?: number;
+  page?: number;
+  more?: boolean;
 }
 
 export interface SinglePropertyResponse {

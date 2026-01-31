@@ -6,5 +6,9 @@ export const leavePageGuard: CanDeactivateFn<PropertyForm> = (component) => {
     return true;
   }
 
-  return confirm('You have not saved the property. Do you want to leave?');
+  const isDirty = !component.pristine();
+  if (isDirty) {
+    return confirm('You have unsaved changes. Do you really want to leave?');
+  }
+  return true;
 };
