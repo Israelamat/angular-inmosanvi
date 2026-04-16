@@ -1,59 +1,61 @@
-# AngularInmosanvi
+# 🏠 InmoSanvi - Pro Real Estate Fullstack Dashboard
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.1.
+[![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.io/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com/)
 
-## Development server
+**InmoSanvi** is a comprehensive real estate management platform that combines a modern frontend architecture with a robust NestJS backend. The system delivers a fluid, reactive, and secure user experience, optimized through Server-Side Rendering (SSR).
 
-To start a local development server, run:
+---
+
+## 🎯 Project Purpose & Architecture
+
+This project was designed to demonstrate the integration of complex data flows and advanced security within enterprise-grade applications:
+
+* **Hybrid Auth System**: Robust authentication implementation featuring local accounts and OAuth (Google & Facebook) integration.
+* **Performance First**: Built with **Standalone Components** to minimize boilerplate and increase flexibility, alongside **Server-Side Rendering (SSR)** to optimize SEO and initial load times.
+* **Scalable Backend**: A modular NestJS architecture managing data persistence, business logic, and secure authentication.
+
+## ✨ Key Features
+
+* **🛡️ Advanced Security**: Custom Angular Interceptors that automatically handle JWT token injection and validate authentication states for route protection.
+* **📍 Geo-Location Services**: Map integration allowing real-time property localization during listing and leveraging user location for "nearby" searches.
+* **📊 Interactive Tools**: 
+    * Built-in mortgage calculator.
+    * Dynamic rating system (stars) and user comments.
+* **👤 User Profile Management**: Comprehensive dashboard for users to manage their listings, edit personal information, and update profile pictures.
+* **🔍 Reactive Filtering**: A high-performance search engine powered by **RxJS**, allowing users to filter properties instantly across multiple criteria without page reloads.
+
+## 🛠️ Technical Stack
+
+### Frontend (Angular)
+- **Architecture**: Standalone Components & Functional Guards.
+- **Rendering**: Angular SSR (Server-Side Rendering).
+- **State Management**: Reactive programming with **RxJS** (Observables & Subjects).
+- **Styling**: Bootstrap/Tailwind with a fully responsive design.
+- **Testing**: Vitest for unit testing.
+
+### Backend (NestJS API)
+- **Auth**: Passport.js (JWT, Google & Facebook strategies).
+- **Communication**: Custom interceptors for header management and global error handling.
+
+---
+
+## 🚀 Getting Started
 
 ```bash
+git clone https://github.com/Israelamat/angular-inmosanvi.git
+npm install
 ng serve
 ```
+---
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## 📸 Screenshots
 
-## Code scaffolding
+Below are some key views of the platform showcasing the UI/UX and main features.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### 🏠 Main Dashboard
+[![Angular-Imno-Sanvi.jpg](https://i.postimg.cc/Mp1szrW5/Angular-Imno-Sanvi.jpg)](https://postimg.cc/MnK0D5ff)
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### 🏡 Property Detail Page
+[![Angular-Imno-Sanvi.jpg](https://i.postimg.cc/Mp1szrW5/Angular-Imno-Sanvi.jpg)](https://postimg.cc/MnK0D5ff)
