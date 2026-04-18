@@ -58,4 +58,4 @@ Below are some key views of the platform showcasing the UI/UX and main features.
 [![Angular-Imno-Sanvi.jpg](https://i.postimg.cc/Mp1szrW5/Angular-Imno-Sanvi.jpg)](https://postimg.cc/MnK0D5ff)
 
 ### 🏡 Property Detail Page
-[![Angular-Imno-Sanvi.jpg](https://i.postimg.cc/Mp1szrW5/Angular-Imno-Sanvi.jpg)](https://postimg.cc/MnK0D5ff)
+[![Angular-Imno-Sanvi2.jpg](https://i.postimg.cc/9FjzFJPj/Angular-Imno-Sanvi2.jpg)](https://postimg.cc/ThCTtjHk)
